@@ -1,0 +1,5 @@
+START
+LDC 1
+LDV 4
+ADD
+SUB
