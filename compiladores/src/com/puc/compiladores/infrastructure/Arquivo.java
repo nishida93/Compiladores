@@ -1,28 +1,68 @@
-package com.puc.compiladores.infrastructure;
+package com.puc.compiladores.infraInstructure;
 
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+        import com.puc.compiladores.ui.VM;
 
-public class Arquivo extends JFileChooser {
+        import javax.swing.*;
+        import java.awt.event.ActionEvent;
+        import java.io.File;
+        import java.io.IOException;
+        import java.nio.file.Files;
+        import java.nio.file.Paths;
+        import java.util.ArrayList;
+        import java.util.List;
+        import java.util.stream.Collectors;
+        import java.util.stream.Stream;
 
-    private JFileChooser fileChooser;
+public class Arquivo {
 
-    public Arquivo() {
-        //super();
-        fileChooser = new JFileChooser();
-        //fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-        int result = fileChooser.showOpenDialog(this);
+    private JFileChooser jFileChooser;
+
+    private List<String> minhaLista;
+
+    public void populaLista(){
+        minhaLista = new ArrayList<>();
+        VM vm = new VM();
+        JFileChooser fileChooser = new JFileChooser();
+        int result =  fileChooser.showOpenDialog(vm);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
-            try {
-                System.out.println(Files.readAllLines(Paths.get(selectedFile.getAbsolutePath())));
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            try (Stream<String> stream = Files.lines(Paths.get(selectedFile.getAbsolutePath()))) {
+                minhaLista = stream.collect(Collectors.toList());
+                System.out.println(minhaLista.get(0));
+                preencherTabelaInstrucoes(minhaLista, vm);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    public void preencherTabelaInstrucoes(List<String> minhaLista, VM vm) {
+
+        Object[] texto;
+
+        if(null == this.minhaLista){
+            texto = new Object[] {1,1,1,1,1};
+        }else {
+            texto = new Object[] {minhaLista.get(0),1,1,1,1};
+            System.out.println("bla" + minhaLista.get(0));
+        }
+
+    }
+
+    public String getLinha(int index) {
+        return minhaLista.get(index);
+    }
+
+    public String getPalavra(int index, int indexPalavra) {
+
+        String linha = getLinha(index);
+
+        String[] palavra = linha.split(" ");
+
+        return palavra[indexPalavra];
+    }
+
+    public void fechar(ActionEvent e) {
+        System.exit(0);
     }
 }

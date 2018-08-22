@@ -4,14 +4,10 @@
 
 package com.puc.compiladores.ui;
 
-import com.puc.compiladores.infrastructure.Arquivo;
+import com.puc.compiladores.infraInstructure.Arquivo;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,27 +17,23 @@ import javax.swing.table.DefaultTableModel;
  */
 public class VM extends JFrame {
     public VM() {
-        jFileChooser = new JFileChooser();
+        Arquivo arquivo = new Arquivo();
         Container contentPane = getContentPane();
         contentPane.setPreferredSize(new Dimension(1200,800));
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
-        initComponents(contentPane);
+        initComponents(contentPane, arquivo);
     }
 
-    private void menuItem5ActionPerformed(ActionEvent e) {
+    private void grupoCompiladores(ActionEvent e) {
         JOptionPane.showMessageDialog(getContentPane(),
                 "Desenvolvedores:\nMatheus Nishida RA: 12212692\nLuan Bonomi RA: 15108780");
     }
 
-    private void menuItem1ActionPerformed(ActionEvent e) {
-        new Arquivo();
+    public Object[] populaListaInstrucoes(DefaultTableModel tabela){
+        return new Object[] {1,1,1,1,1};
     }
 
-    private void menuItem2ActionPerformed(ActionEvent e) {
-        System.exit(0);
-    }
-
-    private void initComponents(Container contentPane) {
+    private void initComponents(Container contentPane, Arquivo arquivo) {
 
         DefaultTableModel modelTable1 = new DefaultTableModel();
         modelTable1.addColumn("Linha");
@@ -49,7 +41,7 @@ public class VM extends JFrame {
         modelTable1.addColumn("Atributo #1");
         modelTable1.addColumn("Atributo #2");
         modelTable1.addColumn("Comentário");
-        modelTable1.addRow(new Object[] {1,1,1,1,1});
+        populaListaInstrucoes(modelTable1);
 
         DefaultTableModel modelTable2 = new DefaultTableModel();
         modelTable2.addColumn("Endereço[S]");
@@ -101,12 +93,12 @@ public class VM extends JFrame {
 
                 //---- menuItem1 ----
                 menuItem1.setText("Abrir...");
-                menuItem1.addActionListener(e -> menuItem1ActionPerformed(e));
+                menuItem1.addActionListener(e -> arquivo.populaLista());
                 menu1.add(menuItem1);
 
                 //---- menuItem2 ----
                 menuItem2.setText("Sair");
-                menuItem2.addActionListener(e -> menuItem2ActionPerformed(e));
+                menuItem2.addActionListener(e -> arquivo.fechar(e));
                 menu1.add(menuItem2);
             }
             menuBar1.add(menu1);
@@ -131,7 +123,7 @@ public class VM extends JFrame {
 
                 //---- menuItem5 ----
                 menuItem5.setText("Sobre");
-                menuItem5.addActionListener(e -> menuItem5ActionPerformed(e));
+                menuItem5.addActionListener(e -> grupoCompiladores(e));
                 menu3.add(menuItem5);
             }
             menuBar1.add(menu3);
