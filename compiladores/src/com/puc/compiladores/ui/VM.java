@@ -8,10 +8,6 @@ import com.puc.compiladores.infrastructure.Arquivo;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Matheus
  */
 public class VM extends JFrame {
+
     public VM() {
         jFileChooser = new JFileChooser();
         Container contentPane = getContentPane();
@@ -34,11 +31,11 @@ public class VM extends JFrame {
     }
 
     private void menuItem1ActionPerformed(ActionEvent e) {
-        new Arquivo();
+        new Arquivo(table1);
     }
 
     private void menuItem2ActionPerformed(ActionEvent e) {
-        System.exit(0);
+        new Arquivo().fechar();
     }
 
     private void initComponents(Container contentPane) {
@@ -49,7 +46,6 @@ public class VM extends JFrame {
         modelTable1.addColumn("Atributo #1");
         modelTable1.addColumn("Atributo #2");
         modelTable1.addColumn("Comentário");
-        modelTable1.addRow(new Object[] {1,1,1,1,1});
 
         DefaultTableModel modelTable2 = new DefaultTableModel();
         modelTable2.addColumn("Endereço[S]");
