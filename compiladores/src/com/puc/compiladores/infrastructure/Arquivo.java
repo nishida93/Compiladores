@@ -10,6 +10,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @author Matheus
+ */
 public class Arquivo extends JFileChooser {
 
     private JFileChooser fileChooser;
@@ -57,7 +60,7 @@ public class Arquivo extends JFileChooser {
 
         for(int i=0 ; i < listArquivo.size() ; i++) {
             Object[] palavra = new Object[] {i+1};
-            //System.out.println("PRINT >>>" + getPalavra(1,0));
+            System.out.println("PRINT >>>" + getPalavra(1,0));
             palavra = adicionaElemento(palavra, getPalavra(i, 0));
             palavra = adicionaElemento(palavra, getPalavra(i, 1).replaceAll(",",""));
             palavra = adicionaElemento(palavra, getPalavra(i, 2).replaceAll(",",""));

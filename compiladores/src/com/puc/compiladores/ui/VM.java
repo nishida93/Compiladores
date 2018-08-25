@@ -17,6 +17,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class VM extends JFrame {
 
+    private DefaultTableModel modelTabelaInstrucoes = new DefaultTableModel();
+    private DefaultTableModel modelTabelaPilha = new DefaultTableModel();
+
     public VM() {
         jFileChooser = new JFileChooser();
         Container contentPane = getContentPane();
@@ -31,108 +34,124 @@ public class VM extends JFrame {
     }
 
     private void menuItem1ActionPerformed(ActionEvent e) {
-        new Arquivo(table1);
+        new Arquivo(tableInstrucoes);
+    }
+
+    private void menuFecharActionPerformed(ActionEvent e) {
+        new Arquivo().fechar();
+    }
+
+    private void menuCompilarActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
+    private void menu3ActionPerformed(ActionEvent e) {
+        // TODO add your code here
     }
 
     private void menuItem2ActionPerformed(ActionEvent e) {
-        new Arquivo().fechar();
+        // TODO add your code here
+    }
+
+    private void btnCompilarActionPerformed(ActionEvent e) {
+        // TODO add your code here
     }
 
     private void initComponents(Container contentPane) {
 
-        DefaultTableModel modelTable1 = new DefaultTableModel();
-        modelTable1.addColumn("Linha");
-        modelTable1.addColumn("Instrução");
-        modelTable1.addColumn("Atributo #1");
-        modelTable1.addColumn("Atributo #2");
-        modelTable1.addColumn("Comentário");
+        modelTabelaInstrucoes.addColumn("Linha");
+        modelTabelaInstrucoes.addColumn("Instrução");
+        modelTabelaInstrucoes.addColumn("Atributo #1");
+        modelTabelaInstrucoes.addColumn("Atributo #2");
+        modelTabelaInstrucoes.addColumn("Comentário");
 
-        DefaultTableModel modelTable2 = new DefaultTableModel();
-        modelTable2.addColumn("Endereço[S]");
-        modelTable2.addColumn("Valor");
+
+        modelTabelaPilha.addColumn("Endereço[S]");
+        modelTabelaPilha.addColumn("Valor");
 
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner Evaluation license - Matheus
-        menuBar1 = new JMenuBar();
-        menu1 = new JMenu();
-        menuItem1 = new JMenuItem();
-        menuItem2 = new JMenuItem();
-        menu2 = new JMenu();
-        menuItem3 = new JMenuItem();
-        menuItem4 = new JMenuItem();
-        menu3 = new JMenu();
-        menuItem5 = new JMenuItem();
+        menuBar = new JMenuBar();
+        menuArquivo = new JMenu();
+        menuItemAbrir = new JMenuItem();
+        menuItemSair = new JMenuItem();
+        menuExecutar = new JMenu();
+        menuItemCompilar = new JMenuItem();
+        menuItemDebuggar = new JMenuItem();
+        menuSobre = new JMenu();
+        menuItemSobre = new JMenuItem();
         panel1 = new JPanel();
-        label1 = new JLabel();
-        scrollPane1 = new JScrollPane();
-        table1 = new JTable(modelTable1);
+        lblInstrucoes = new JLabel();
+        scrollTabelaInstrucoes = new JScrollPane();
+        tableInstrucoes = new JTable(modelTabelaInstrucoes);
         panel3 = new JPanel();
         panel4 = new JPanel();
-        label3 = new JLabel();
-        scrollPane3 = new JScrollPane();
-        textArea1 = new JTextArea();
+        lblEntrada = new JLabel();
+        scrollEntrada = new JScrollPane();
+        textAreaEntrada = new JTextArea();
         panel5 = new JPanel();
-        label5 = new JLabel();
-        scrollPane4 = new JScrollPane();
-        textArea2 = new JTextArea();
+        lblSaida = new JLabel();
+        scrollSaida = new JScrollPane();
+        textAreaSaida = new JTextArea();
         panel6 = new JPanel();
-        label7 = new JLabel();
-        scrollPane5 = new JScrollPane();
-        textArea3 = new JTextArea();
+        lblBreakPoints = new JLabel();
+        scrollBreakPoints = new JScrollPane();
+        textAreaBreakPoints = new JTextArea();
         panel2 = new JPanel();
-        label2 = new JLabel();
-        scrollPane2 = new JScrollPane();
-        table2 = new JTable(modelTable2);
+        lblPilha = new JLabel();
+        scrollPilha = new JScrollPane();
+        tablePilha = new JTable(modelTabelaPilha);
 
         //======== this ========
-        //Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-        //======== menuBar1 ========
+        //======== menuBar ========
         {
 
-            //======== menu1 ========
+            //======== menuArquivo ========
             {
-                menu1.setText("Arquivo");
+                menuArquivo.setText("Arquivo");
 
-                //---- menuItem1 ----
-                menuItem1.setText("Abrir...");
-                menuItem1.addActionListener(e -> menuItem1ActionPerformed(e));
-                menu1.add(menuItem1);
+                //---- menuItemAbrir ----
+                menuItemAbrir.setText("Abrir...");
+                menuItemAbrir.addActionListener(e -> menuItem1ActionPerformed(e));
+                menuArquivo.add(menuItemAbrir);
 
-                //---- menuItem2 ----
-                menuItem2.setText("Sair");
-                menuItem2.addActionListener(e -> menuItem2ActionPerformed(e));
-                menu1.add(menuItem2);
+                //---- menuItemSair ----
+                menuItemSair.setText("Sair");
+                menuItemSair.addActionListener(e -> menuItem2ActionPerformed(e));
+                menuArquivo.add(menuItemSair);
             }
-            menuBar1.add(menu1);
+            menuBar.add(menuArquivo);
 
-            //======== menu2 ========
+            //======== menuExecutar ========
             {
-                menu2.setText("Executar");
+                menuExecutar.setText("Executar");
 
-                //---- menuItem3 ----
-                menuItem3.setText("Compilar");
-                menu2.add(menuItem3);
+                //---- menuItemCompilar ----
+                menuItemCompilar.setText("Compilar");
+                menuItemCompilar.addActionListener(e -> btnCompilarActionPerformed(e));
+                menuExecutar.add(menuItemCompilar);
 
-                //---- menuItem4 ----
-                menuItem4.setText("Debuggar");
-                menu2.add(menuItem4);
+                //---- menuItemDebuggar ----
+                menuItemDebuggar.setText("Debuggar");
+                menuExecutar.add(menuItemDebuggar);
             }
-            menuBar1.add(menu2);
+            menuBar.add(menuExecutar);
 
-            //======== menu3 ========
+            //======== menuSobre ========
             {
-                menu3.setText("Sobre...");
+                menuSobre.setText("Sobre...");
+                menuSobre.addActionListener(e -> menu3ActionPerformed(e));
 
-                //---- menuItem5 ----
-                menuItem5.setText("Sobre");
-                menuItem5.addActionListener(e -> menuItem5ActionPerformed(e));
-                menu3.add(menuItem5);
+                //---- menuItemSobre ----
+                menuItemSobre.setText("Sobre");
+                menuItemSobre.addActionListener(e -> menuItem5ActionPerformed(e));
+                menuSobre.add(menuItemSobre);
             }
-            menuBar1.add(menu3);
+            menuBar.add(menuSobre);
         }
-        setJMenuBar(menuBar1);
+        setJMenuBar(menuBar);
 
         //======== panel1 ========
         {
@@ -140,20 +159,20 @@ public class VM extends JFrame {
             panel1.setBorder(LineBorder.createBlackLineBorder());
             panel1.setLayout(new BorderLayout());
 
-            //---- label1 ----
-            label1.setText("Instru\u00e7\u00f5es a serem executadas pela VM");
-            label1.setHorizontalAlignment(SwingConstants.CENTER);
-            label1.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-            label1.setBorder(LineBorder.createBlackLineBorder());
-            panel1.add(label1, BorderLayout.NORTH);
+            //---- lblInstrucoes ----
+            lblInstrucoes.setText("Instru\u00e7\u00f5es a serem executadas pela VM");
+            lblInstrucoes.setHorizontalAlignment(SwingConstants.CENTER);
+            lblInstrucoes.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
+            lblInstrucoes.setBorder(LineBorder.createBlackLineBorder());
+            panel1.add(lblInstrucoes, BorderLayout.NORTH);
 
-            //======== scrollPane1 ========
+            //======== scrollTabelaInstrucoes ========
             {
-                scrollPane1.setPreferredSize(new Dimension(454, 2000));
-                scrollPane1.setBorder(LineBorder.createBlackLineBorder());
-                scrollPane1.setViewportView(table1);
+                scrollTabelaInstrucoes.setPreferredSize(new Dimension(454, 2000));
+                scrollTabelaInstrucoes.setBorder(LineBorder.createBlackLineBorder());
+                scrollTabelaInstrucoes.setViewportView(tableInstrucoes);
             }
-            panel1.add(scrollPane1, BorderLayout.CENTER);
+            panel1.add(scrollTabelaInstrucoes, BorderLayout.CENTER);
 
             //======== panel3 ========
             {
@@ -167,21 +186,21 @@ public class VM extends JFrame {
                     panel4.setBorder(LineBorder.createBlackLineBorder());
                     panel4.setLayout(new BorderLayout());
 
-                    //---- label3 ----
-                    label3.setText("Janela de Entrada");
-                    label3.setHorizontalAlignment(SwingConstants.CENTER);
-                    label3.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-                    label3.setBorder(LineBorder.createBlackLineBorder());
-                    panel4.add(label3, BorderLayout.NORTH);
+                    //---- lblEntrada ----
+                    lblEntrada.setText("Janela de Entrada");
+                    lblEntrada.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblEntrada.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
+                    lblEntrada.setBorder(LineBorder.createBlackLineBorder());
+                    panel4.add(lblEntrada, BorderLayout.NORTH);
 
-                    //======== scrollPane3 ========
+                    //======== scrollEntrada ========
                     {
 
-                        //---- textArea1 ----
-                        textArea1.setText("Input test");
-                        scrollPane3.setViewportView(textArea1);
+                        //---- textAreaEntrada ----
+                        textAreaEntrada.setText("Input test");
+                        scrollEntrada.setViewportView(textAreaEntrada);
                     }
-                    panel4.add(scrollPane3, BorderLayout.CENTER);
+                    panel4.add(scrollEntrada, BorderLayout.CENTER);
                 }
                 panel3.add(panel4, BorderLayout.WEST);
 
@@ -191,21 +210,21 @@ public class VM extends JFrame {
                     panel5.setBorder(LineBorder.createBlackLineBorder());
                     panel5.setLayout(new BorderLayout());
 
-                    //---- label5 ----
-                    label5.setText("Janela de Sa\u00edda");
-                    label5.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-                    label5.setHorizontalAlignment(SwingConstants.CENTER);
-                    label5.setBorder(LineBorder.createBlackLineBorder());
-                    panel5.add(label5, BorderLayout.NORTH);
+                    //---- lblSaida ----
+                    lblSaida.setText("Janela de Sa\u00edda");
+                    lblSaida.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
+                    lblSaida.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblSaida.setBorder(LineBorder.createBlackLineBorder());
+                    panel5.add(lblSaida, BorderLayout.NORTH);
 
-                    //======== scrollPane4 ========
+                    //======== scrollSaida ========
                     {
 
-                        //---- textArea2 ----
-                        textArea2.setText("Output test");
-                        scrollPane4.setViewportView(textArea2);
+                        //---- textAreaSaida ----
+                        textAreaSaida.setText("Output test");
+                        scrollSaida.setViewportView(textAreaSaida);
                     }
-                    panel5.add(scrollPane4, BorderLayout.CENTER);
+                    panel5.add(scrollSaida, BorderLayout.CENTER);
                 }
                 panel3.add(panel5, BorderLayout.CENTER);
 
@@ -215,21 +234,21 @@ public class VM extends JFrame {
                     panel6.setBorder(LineBorder.createBlackLineBorder());
                     panel6.setLayout(new BorderLayout());
 
-                    //---- label7 ----
-                    label7.setText("Break Points");
-                    label7.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-                    label7.setHorizontalAlignment(SwingConstants.CENTER);
-                    label7.setBorder(LineBorder.createBlackLineBorder());
-                    panel6.add(label7, BorderLayout.NORTH);
+                    //---- lblBreakPoints ----
+                    lblBreakPoints.setText("Break Points");
+                    lblBreakPoints.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
+                    lblBreakPoints.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblBreakPoints.setBorder(LineBorder.createBlackLineBorder());
+                    panel6.add(lblBreakPoints, BorderLayout.NORTH);
 
-                    //======== scrollPane5 ========
+                    //======== scrollBreakPoints ========
                     {
 
-                        //---- textArea3 ----
-                        textArea3.setText("Break point #1");
-                        scrollPane5.setViewportView(textArea3);
+                        //---- textAreaBreakPoints ----
+                        textAreaBreakPoints.setText("Break point #1");
+                        scrollBreakPoints.setViewportView(textAreaBreakPoints);
                     }
-                    panel6.add(scrollPane5, BorderLayout.CENTER);
+                    panel6.add(scrollBreakPoints, BorderLayout.CENTER);
                 }
                 panel3.add(panel6, BorderLayout.EAST);
             }
@@ -242,22 +261,22 @@ public class VM extends JFrame {
             panel2.setBorder(LineBorder.createBlackLineBorder());
             panel2.setLayout(new BorderLayout());
 
-            //---- label2 ----
-            label2.setText("Conte\u00fado da Pilha");
-            label2.setHorizontalAlignment(SwingConstants.CENTER);
-            label2.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-            label2.setBorder(LineBorder.createBlackLineBorder());
-            panel2.add(label2, BorderLayout.NORTH);
+            //---- lblPilha ----
+            lblPilha.setText("Conte\u00fado da Pilha");
+            lblPilha.setHorizontalAlignment(SwingConstants.CENTER);
+            lblPilha.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
+            lblPilha.setBorder(LineBorder.createBlackLineBorder());
+            panel2.add(lblPilha, BorderLayout.NORTH);
 
-            //======== scrollPane2 ========
+            //======== scrollPilha ========
             {
-                scrollPane2.setBorder(LineBorder.createBlackLineBorder());
+                scrollPilha.setBorder(LineBorder.createBlackLineBorder());
 
-                //---- table2 ----
-                table2.setPreferredScrollableViewportSize(new Dimension(190, 400));
-                scrollPane2.setViewportView(table2);
+                //---- tablePilha ----
+                tablePilha.setPreferredScrollableViewportSize(new Dimension(190, 400));
+                scrollPilha.setViewportView(tablePilha);
             }
-            panel2.add(scrollPane2, BorderLayout.CENTER);
+            panel2.add(scrollPilha, BorderLayout.CENTER);
         }
         contentPane.add(panel2);
         pack();
@@ -267,36 +286,36 @@ public class VM extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Matheus
-    private JMenuBar menuBar1;
-    private JMenu menu1;
-    private JMenuItem menuItem1;
-    private JMenuItem menuItem2;
-    private JMenu menu2;
-    private JMenuItem menuItem3;
-    private JMenuItem menuItem4;
-    private JMenu menu3;
-    private JMenuItem menuItem5;
+    private JMenuBar menuBar;
+    private JMenu menuArquivo;
+    private JMenuItem menuItemAbrir;
+    private JMenuItem menuItemSair;
+    private JMenu menuExecutar;
+    private JMenuItem menuItemCompilar;
+    private JMenuItem menuItemDebuggar;
+    private JMenu menuSobre;
+    private JMenuItem menuItemSobre;
     private JPanel panel1;
-    private JLabel label1;
-    private JScrollPane scrollPane1;
-    private JTable table1;
+    private JLabel lblInstrucoes;
+    private JScrollPane scrollTabelaInstrucoes;
+    private JTable tableInstrucoes;
     private JPanel panel3;
     private JPanel panel4;
-    private JLabel label3;
-    private JScrollPane scrollPane3;
-    private JTextArea textArea1;
+    private JLabel lblEntrada;
+    private JScrollPane scrollEntrada;
+    private JTextArea textAreaEntrada;
     private JPanel panel5;
-    private JLabel label5;
-    private JScrollPane scrollPane4;
-    private JTextArea textArea2;
+    private JLabel lblSaida;
+    private JScrollPane scrollSaida;
+    private JTextArea textAreaSaida;
     private JPanel panel6;
-    private JLabel label7;
-    private JScrollPane scrollPane5;
-    private JTextArea textArea3;
+    private JLabel lblBreakPoints;
+    private JScrollPane scrollBreakPoints;
+    private JTextArea textAreaBreakPoints;
     private JPanel panel2;
-    private JLabel label2;
-    private JScrollPane scrollPane2;
-    private JTable table2;
+    private JLabel lblPilha;
+    private JScrollPane scrollPilha;
+    private JTable tablePilha;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 
     private JFileChooser jFileChooser;
