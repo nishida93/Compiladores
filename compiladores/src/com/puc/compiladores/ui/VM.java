@@ -57,6 +57,7 @@ public class VM extends JFrame {
         // TODO add your code here
     }
 
+    @SuppressWarnings("unchecked")
     private void initComponents(Container contentPane) {
 
         modelTabelaInstrucoes.addColumn("Linha");
