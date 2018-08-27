@@ -107,6 +107,13 @@ new FormModel {
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "East"
 					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnContinuar"
+						"text": "Continuar"
+						"actionCommand": "Continuar"
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "South"
+					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "South"
 				} )
@@ -157,10 +164,12 @@ new FormModel {
 						name: "menuItemCompilar"
 						"text": "Compilar"
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCompilarActionPerformed", true ) )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItemCompilarActionPerformed", true ) )
 					} )
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
 						name: "menuItemDebuggar"
 						"text": "Debuggar"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItemDebuggarActionPerformed", true ) )
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {

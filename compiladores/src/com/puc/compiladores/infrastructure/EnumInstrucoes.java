@@ -15,7 +15,10 @@ public enum EnumInstrucoes {
     ALLOC, DALLOC, // memory allocation
     CALL, RETURN; // call procs and funcs
 
-    public boolean isValidCommand (String command) {
+
+    EnumInstrucoes() {}
+
+    public static boolean isValidCommand (String command) {
         EnumInstrucoes[] allInst = EnumInstrucoes.values();
         for (EnumInstrucoes inst : allInst) {
             if (inst.equals(command)) {
@@ -24,6 +27,7 @@ public enum EnumInstrucoes {
         }
         return false;
     }
+
 
 
 }

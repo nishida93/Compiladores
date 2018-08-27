@@ -34,7 +34,7 @@ public class VM extends JFrame {
     }
 
     private void menuItem1ActionPerformed(ActionEvent e) {
-        new Arquivo(tableInstrucoes);
+        new Arquivo(tableInstrucoes, tablePilha);
     }
 
     private void menuFecharActionPerformed(ActionEvent e) {
@@ -55,6 +55,17 @@ public class VM extends JFrame {
 
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
+    }
+
+    private void menuItemCompilarActionPerformed(ActionEvent e) {
+        // TODO add your code here
+        new Arquivo(tablePilha, false);
+    }
+
+    private void menuItemDebuggarActionPerformed(ActionEvent e) {
+        // TODO add your code here
+        btnContinuar.setEnabled(true);
+        new Arquivo(tablePilha, true);
     }
 
     @SuppressWarnings("unchecked")
@@ -98,6 +109,7 @@ public class VM extends JFrame {
         lblBreakPoints = new JLabel();
         scrollBreakPoints = new JScrollPane();
         textAreaBreakPoints = new JTextArea();
+        btnContinuar = new JButton();
         panel2 = new JPanel();
         lblPilha = new JLabel();
         scrollPilha = new JScrollPane();
@@ -131,11 +143,15 @@ public class VM extends JFrame {
 
                 //---- menuItemCompilar ----
                 menuItemCompilar.setText("Compilar");
-                menuItemCompilar.addActionListener(e -> btnCompilarActionPerformed(e));
+                menuItemCompilar.addActionListener(e -> {
+			btnCompilarActionPerformed(e);
+			menuItemCompilarActionPerformed(e);
+		});
                 menuExecutar.add(menuItemCompilar);
 
                 //---- menuItemDebuggar ----
                 menuItemDebuggar.setText("Debuggar");
+                menuItemDebuggar.addActionListener(e -> menuItemDebuggarActionPerformed(e));
                 menuExecutar.add(menuItemDebuggar);
             }
             menuBar.add(menuExecutar);
@@ -252,6 +268,11 @@ public class VM extends JFrame {
                     panel6.add(scrollBreakPoints, BorderLayout.CENTER);
                 }
                 panel3.add(panel6, BorderLayout.EAST);
+
+                //---- btnContinuar ----
+                btnContinuar.setText("Continuar");
+                btnContinuar.setActionCommand("Continuar");
+                panel3.add(btnContinuar, BorderLayout.SOUTH);
             }
             panel1.add(panel3, BorderLayout.SOUTH);
         }
@@ -283,6 +304,13 @@ public class VM extends JFrame {
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
+
+
+
+
+
+
+        btnContinuar.setEnabled(false);
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
@@ -313,6 +341,7 @@ public class VM extends JFrame {
     private JLabel lblBreakPoints;
     private JScrollPane scrollBreakPoints;
     private JTextArea textAreaBreakPoints;
+    private JButton btnContinuar;
     private JPanel panel2;
     private JLabel lblPilha;
     private JScrollPane scrollPilha;
