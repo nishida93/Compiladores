@@ -10,7 +10,7 @@ new FormModel {
 				"preferredSize": new java.awt.Dimension( 600, 2216 )
 				"border": &LineBorder0 new javax.swing.border.LineBorder( sfield java.awt.Color black, 1, false )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label1"
+					name: "lblInstrucoes"
 					"text": "Instruções a serem executadas pela VM"
 					"horizontalAlignment": 0
 					"font": new java.awt.Font( ".SF NS Text", 3, 13 )
@@ -19,11 +19,11 @@ new FormModel {
 					"value": "North"
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-					name: "scrollPane1"
+					name: "scrollTabelaInstrucoes"
 					"preferredSize": new java.awt.Dimension( 454, 2000 )
 					"border": #LineBorder0
 					add( new FormComponent( "javax.swing.JTable" ) {
-						name: "table1"
+						name: "tableInstrucoes"
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "Center"
@@ -37,7 +37,7 @@ new FormModel {
 						"foreground": new java.awt.Color( 153, 153, 153, 255 )
 						"border": #LineBorder0
 						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label3"
+							name: "lblEntrada"
 							"text": "Janela de Entrada"
 							"horizontalAlignment": 0
 							"font": new java.awt.Font( ".SF NS Text", 3, 13 )
@@ -46,9 +46,9 @@ new FormModel {
 							"value": "North"
 						} )
 						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollPane3"
+							name: "scrollEntrada"
 							add( new FormComponent( "javax.swing.JTextArea" ) {
-								name: "textArea1"
+								name: "textAreaEntrada"
 								"text": "Input test"
 							} )
 						}, new FormLayoutConstraints( class java.lang.String ) {
@@ -62,7 +62,7 @@ new FormModel {
 						"preferredSize": new java.awt.Dimension( 200, 200 )
 						"border": #LineBorder0
 						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label5"
+							name: "lblSaida"
 							"text": "Janela de Saída"
 							"font": new java.awt.Font( ".SF NS Text", 3, 13 )
 							"horizontalAlignment": 0
@@ -71,9 +71,9 @@ new FormModel {
 							"value": "North"
 						} )
 						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollPane4"
+							name: "scrollSaida"
 							add( new FormComponent( "javax.swing.JTextArea" ) {
-								name: "textArea2"
+								name: "textAreaSaida"
 								"text": "Output test"
 							} )
 						}, new FormLayoutConstraints( class java.lang.String ) {
@@ -87,7 +87,7 @@ new FormModel {
 						"preferredSize": new java.awt.Dimension( 200, 32 )
 						"border": #LineBorder0
 						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label7"
+							name: "lblBreakPoints"
 							"text": "Break Points"
 							"font": new java.awt.Font( ".SF NS Text", 3, 13 )
 							"horizontalAlignment": 0
@@ -96,9 +96,9 @@ new FormModel {
 							"value": "North"
 						} )
 						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollPane5"
+							name: "scrollBreakPoints"
 							add( new FormComponent( "javax.swing.JTextArea" ) {
-								name: "textArea3"
+								name: "textAreaBreakPoints"
 								"text": "Break point #1"
 							} )
 						}, new FormLayoutConstraints( class java.lang.String ) {
@@ -106,6 +106,13 @@ new FormModel {
 						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "East"
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnContinuar"
+						"text": "Continuar"
+						"actionCommand": "Continuar"
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "South"
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "South"
@@ -115,7 +122,7 @@ new FormModel {
 				name: "panel2"
 				"border": #LineBorder0
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label2"
+					name: "lblPilha"
 					"text": "Conteúdo da Pilha"
 					"horizontalAlignment": 0
 					"font": new java.awt.Font( ".SF NS Text", 3, 13 )
@@ -124,10 +131,10 @@ new FormModel {
 					"value": "North"
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-					name: "scrollPane2"
+					name: "scrollPilha"
 					"border": #LineBorder0
 					add( new FormComponent( "javax.swing.JTable" ) {
-						name: "table2"
+						name: "tablePilha"
 						"preferredScrollableViewportSize": new java.awt.Dimension( 190, 400 )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
@@ -135,34 +142,45 @@ new FormModel {
 				} )
 			} )
 			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
-				name: "menuBar1"
+				name: "menuBar"
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-					name: "menu1"
+					name: "menuArquivo"
 					"text": "Arquivo"
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
-						name: "menuItem1"
+						name: "menuItemAbrir"
 						"text": "Abrir..."
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItem1ActionPerformed", true ) )
 					} )
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
-						name: "menuItem2"
+						name: "menuItemSair"
 						"text": "Sair"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItem2ActionPerformed", true ) )
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-					name: "menu2"
+					name: "menuExecutar"
 					"text": "Executar"
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
-						name: "menuItem3"
+						name: "menuItemCompilar"
 						"text": "Compilar"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCompilarActionPerformed", true ) )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItemCompilarActionPerformed", true ) )
 					} )
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
-						name: "menuItem4"
+						name: "menuItemDebuggar"
 						"text": "Debuggar"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItemDebuggarActionPerformed", true ) )
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-					name: "menu3"
+					name: "menuSobre"
 					"text": "Sobre..."
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menu3ActionPerformed", true ) )
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "menuItemSobre"
+						"text": "Sobre"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItem5ActionPerformed", true ) )
+					} )
 				} )
 			}
 		}, new FormLayoutConstraints( null ) {
