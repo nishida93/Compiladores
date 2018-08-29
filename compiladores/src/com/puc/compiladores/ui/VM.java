@@ -8,6 +8,13 @@ import com.puc.compiladores.infrastructure.Arquivo;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,6 +26,7 @@ public class VM extends JFrame {
 
     private DefaultTableModel modelTabelaInstrucoes = new DefaultTableModel();
     private DefaultTableModel modelTabelaPilha = new DefaultTableModel();
+    private ArrayList<String> listArquivo;
 
     public VM() {
         jFileChooser = new JFileChooser();
@@ -34,7 +42,22 @@ public class VM extends JFrame {
     }
 
     private void menuItem1ActionPerformed(ActionEvent e) {
-        new Arquivo(tableInstrucoes, tablePilha);
+
+        JFileChooser fileChooser = new JFileChooser();
+        listArquivo = new ArrayList<>();
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try (Stream<String> stream = Files.lines(Paths.get(selectedFile.getAbsolutePath()))) {
+                listArquivo = (ArrayList<String>) stream.collect(Collectors.toList());
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        new Arquivo(tableInstrucoes, listArquivo);
+
     }
 
     private void menuFecharActionPerformed(ActionEvent e) {
@@ -59,13 +82,15 @@ public class VM extends JFrame {
 
     private void menuItemCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
-        new Arquivo(tablePilha, false);
+        //System.out.println("ARQUIVO> " + listArquivo);
+        new Arquivo(tablePilha, false, listArquivo);
     }
 
     private void menuItemDebuggarActionPerformed(ActionEvent e) {
         // TODO add your code here
+        //System.out.println("ARQUIVO> " + listArquivo);
         btnContinuar.setEnabled(true);
-        new Arquivo(tablePilha, true);
+        new Arquivo(tablePilha, true, listArquivo);
     }
 
     @SuppressWarnings("unchecked")

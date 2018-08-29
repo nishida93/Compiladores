@@ -18,37 +18,25 @@ import java.util.stream.Stream;
  */
 public class Arquivo extends JFileChooser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Arquivo.class);
-    private JFileChooser fileChooser;
     private ArrayList<String> listArquivo;
-    private EnumInstrucoes enumInstrucoes;
     private Pilha pilha;
 
-    public Arquivo() { }
+    public Arquivo() {}
 
-    public Arquivo(JTable stackTable, boolean isDebug) {
+    public Arquivo(JTable stackTable, boolean isDebug, ArrayList<String> arquivo) {
+        listArquivo = arquivo;
+        pilha = new Pilha();
+        System.out.println(arquivo);
         if(isDebug) {
             System.out.println("Eh modo debug");
         }
-        DefaultTableModel model2 = (DefaultTableModel) stackTable.getModel();
-        populateStackTable(model2);
+        populateStackTable(stackTable, arquivo);
     }
 
-    public Arquivo(JTable instructionsTable, JTable stackTable) {
-        pilha = new Pilha();
-        listArquivo = new ArrayList<>();
-        fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(this);
+    public Arquivo(JTable instructionsTable, ArrayList<String> arquivo) {
+        listArquivo = arquivo;
+        populateTables(arquivo, instructionsTable);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            try (Stream<String> stream = Files.lines(Paths.get(selectedFile.getAbsolutePath()))) {
-                listArquivo = (ArrayList<String>) stream.collect(Collectors.toList());
-                populateTables(instructionsTable, stackTable);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public String getLinha(int index) {
@@ -64,18 +52,42 @@ public class Arquivo extends JFileChooser {
         try{
             return palavra[indexPalavra];
         } catch (ArrayIndexOutOfBoundsException e) {
+            // Caso nao exista o index, retorna String vazia
             System.out.println("Error index >>> " + e.getMessage());
             return "";
         }
 
     }
 
-    private void populateTables(JTable instructionsTable, JTable stackTable) {
+    private void populateTables(ArrayList<String> arquivo, JTable instructionsTable) {
         DefaultTableModel model = (DefaultTableModel) instructionsTable.getModel();
-        DefaultTableModel model2 = (DefaultTableModel) stackTable.getModel();
         clearAllRows(model);
-        for(int i=0 ; i < listArquivo.size() ; i++) {
+        for(int i=0 ; i < arquivo.size() ; i++) {
             Object[] palavra = new Object[] {i+1};
+
+            String comando = getPalavra(i, 0);
+            String param1 = getPalavra(i, 1).replaceAll(",", "");
+            String param2 = getPalavra(i, 2).replaceAll(",", "");
+
+            palavra = adicionaElemento(palavra, comando);
+            palavra = adicionaElemento(palavra, param1);
+            palavra = adicionaElemento(palavra, param2);
+            model.addRow(palavra);
+        }
+    }
+
+    private void clearAllRows(DefaultTableModel model) {
+        model.getRowCount();
+        for (int i = model.getRowCount() - 1; i >= 0; i--) {
+            model.removeRow(i);
+        }
+    }
+
+    private void populateStackTable(JTable stackTable, ArrayList<String> arquivo) {
+        DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
+        clearAllRows(stackTableModel);
+        for(int i=0 ; i < arquivo.size() ; i++) {
+            System.out.println("Topo da pilha > " + pilha.getTopo());
 
             String comando = getPalavra(i, 0);
             String param1 = getPalavra(i, 1).replaceAll(",", "");
@@ -87,34 +99,34 @@ public class Arquivo extends JFileChooser {
                 // TODO implementar as logicas de cada comando
                 // “Pára a execução da MVD”
             } else if(comando.equals(EnumInstrucoes.LDC.toString())) {
+                System.out.println("ENTROU EM LDC");
                 pilha.incrementaTopo(); // S:=s + 1
                 pilha.inserePilha(pilha.getTopo(), Integer.parseInt(param1)); // M [s]: = k
             } else if(comando.equals(EnumInstrucoes.LDV.toString())) {
                 pilha.incrementaTopo(); // S:=s + 1
                 pilha.inserePilha(pilha.getTopo(), pilha.getValor(Integer.parseInt(param1))); // M[s]:=M[n]
             } else if(comando.equals(EnumInstrucoes.ADD.toString())) {
+
                 pilha.inserePilha(pilha.getTopo() - 1,
                         pilha.getValor(pilha.getTopo() - 1) + pilha.getValor(pilha.getTopo())); // M[s-1]:=M[s-1] + M[s]
+                System.out.println("Inseriu na pilha");
                 pilha.decrementaTopo(); // s:=s - 1
             } else if(comando.equals(EnumInstrucoes.SUB.toString())) {
                 pilha.inserePilha(pilha.getTopo() - 1,
                         pilha.getValor(pilha.getTopo() - 1) - pilha.getValor(pilha.getTopo())); // M[s-1]:=M[s-1] - M[s]
                 pilha.decrementaTopo(); // s:=s - 1
             } else if(comando.equals(EnumInstrucoes.MULT.toString())) {
-                // TODO implementar as logicas de cada comando
                 // M[s-1]:=M[s-1] * M[s]
                 pilha.inserePilha(pilha.getTopo() - 1,
                         pilha.getValor(pilha.getTopo() - 1) * pilha.getValor(pilha.getTopo()));
                 // ; s:=s - 1
                 pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.DIVI.toString())) {
-                // TODO implementar as logicas de cada comando
                 // M[s-1]:=M[s-1] div M[s]
                 pilha.inserePilha(pilha.getTopo() - 1,
                         pilha.getValor(pilha.getTopo() - 1) / pilha.getValor(pilha.getTopo()));
                 // s:=s - 1
             } else if(comando.equals(EnumInstrucoes.INV.toString())) {
-                // TODO implementar as logicas de cada comando
                 // M[s]:= -M[s]
                 pilha.inserePilha(pilha.getTopo(), -pilha.getValor(pilha.getTopo()));
             } else if(comando.equals(EnumInstrucoes.AND.toString())) {
@@ -126,7 +138,6 @@ public class Arquivo extends JFileChooser {
                 // se M[s-1] = 1 ou M[s] = 1 então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
 
             } else if(comando.equals(EnumInstrucoes.NEG.toString())) {
-                // TODO implementar as logicas de cada comando
                 // M[s]:=1 - M[s]
                 pilha.inserePilha(pilha.getTopo(), 1 - pilha.getTopo());
             } else if(comando.equals(EnumInstrucoes.CME.toString())) {
@@ -148,7 +159,6 @@ public class Arquivo extends JFileChooser {
                 // TODO implementar as logicas de cada comando
                 // se M[s-1] ≠ M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
             } else if(comando.equals(EnumInstrucoes.STR.toString())) {
-                // TODO implementar as logicas de cada comando
                 // M[n]:=M[s]
                 pilha.inserePilha(Integer.parseInt(param1), pilha.getValor(pilha.getTopo()));
                 // s:=s-1
@@ -184,29 +194,17 @@ public class Arquivo extends JFileChooser {
                 // TODO implementar as logicas de cada comando
                 // i:=M[s]; s:=s - 1
             }
-
-            //populateStackTable(model2);
-
-            palavra = adicionaElemento(palavra, getPalavra(i, 0));
-            palavra = adicionaElemento(palavra, getPalavra(i, 1).replaceAll(",",""));
-            palavra = adicionaElemento(palavra, getPalavra(i, 2).replaceAll(",",""));
-            palavra = adicionaElemento(palavra, getPalavra(i, 3).replaceAll(",",""));
-            model.addRow(palavra);
         }
-    }
 
-    private void clearAllRows(DefaultTableModel model) {
-        model.getRowCount();
-        for (int i = model.getRowCount() - 1; i >= 0; i--) {
-            model.removeRow(i);
+        for(int i=0 ; i <= pilha.getTopo() ; i++) {
+            System.out.println("Valor da pilha > " + pilha.getValor(i));
+            Object[] palavra = new Object[] {i, pilha.getValor(i)};
+            palavra = adicionaElemento(palavra, palavra);
+            stackTableModel.addRow(palavra);
         }
-    }
 
-    private void populateStackTable(DefaultTableModel model2) {
-        System.out.println("Entrando no metodo populate STACK");
-        LOG.info("Bla bla bla");
-        //clearAllRows(model2);
-        model2.addRow(new Object[] {10,30});
+
+
     }
 
     private Object[] adicionaElemento(Object[] obj, Object newObj) {
