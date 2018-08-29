@@ -1,17 +1,10 @@
 package com.puc.compiladores.infrastructure;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.puc.compiladores.ui.VM;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Matheus
@@ -20,17 +13,19 @@ public class Arquivo extends JFileChooser {
 
     private ArrayList<String> listArquivo;
     private Pilha pilha;
+    private VM vm = new VM();
 
     public Arquivo() {}
 
-    public Arquivo(JTable stackTable, boolean isDebug, ArrayList<String> arquivo) {
+    public Arquivo(JTable stackTable, boolean isDebug, ArrayList<String> arquivo, VM virtualMachine) {
+        virtualMachine.clearOutput();
         listArquivo = arquivo;
         pilha = new Pilha();
         System.out.println(arquivo);
         if(isDebug) {
             System.out.println("Eh modo debug");
         }
-        populateStackTable(stackTable, arquivo);
+        populateStackTable(stackTable, arquivo, virtualMachine);
     }
 
     public Arquivo(JTable instructionsTable, ArrayList<String> arquivo) {
@@ -83,7 +78,7 @@ public class Arquivo extends JFileChooser {
         }
     }
 
-    private void populateStackTable(JTable stackTable, ArrayList<String> arquivo) {
+    private void populateStackTable(JTable stackTable, ArrayList<String> arquivo, VM virtualMachine) {
         DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
         clearAllRows(stackTableModel);
         for(int i=0 ; i < arquivo.size() ; i++) {
@@ -96,17 +91,15 @@ public class Arquivo extends JFileChooser {
             if (comando.equals(EnumInstrucoes.START.toString())) {
                 pilha.decrementaTopo(); // S:=-1
             } else if(comando.equals(EnumInstrucoes.HLT.toString())) {
-                // TODO implementar as logicas de cada comando
                 // “Pára a execução da MVD”
+                break;
             } else if(comando.equals(EnumInstrucoes.LDC.toString())) {
-                System.out.println("ENTROU EM LDC");
                 pilha.incrementaTopo(); // S:=s + 1
                 pilha.inserePilha(pilha.getTopo(), Integer.parseInt(param1)); // M [s]: = k
             } else if(comando.equals(EnumInstrucoes.LDV.toString())) {
                 pilha.incrementaTopo(); // S:=s + 1
                 pilha.inserePilha(pilha.getTopo(), pilha.getValor(Integer.parseInt(param1))); // M[s]:=M[n]
             } else if(comando.equals(EnumInstrucoes.ADD.toString())) {
-
                 pilha.inserePilha(pilha.getTopo() - 1,
                         pilha.getValor(pilha.getTopo() - 1) + pilha.getValor(pilha.getTopo())); // M[s-1]:=M[s-1] + M[s]
                 System.out.println("Inseriu na pilha");
@@ -130,72 +123,145 @@ public class Arquivo extends JFileChooser {
                 // M[s]:= -M[s]
                 pilha.inserePilha(pilha.getTopo(), -pilha.getValor(pilha.getTopo()));
             } else if(comando.equals(EnumInstrucoes.AND.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M [s-1] = 1 e M[s] = 1 então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
-
+                if (pilha.getValor(pilha.getTopo() - 1) == 1 &&
+                    pilha.getValor(pilha.getTopo()) == 1) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.OR.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] = 1 ou M[s] = 1 então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
-
+                if (pilha.getValor(pilha.getTopo() - 1) == 1 ||
+                        pilha.getValor(pilha.getTopo()) == 1) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.NEG.toString())) {
                 // M[s]:=1 - M[s]
                 pilha.inserePilha(pilha.getTopo(), 1 - pilha.getTopo());
             } else if(comando.equals(EnumInstrucoes.CME.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] < M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
+                if (pilha.getValor(pilha.getTopo() - 1) < pilha.getValor(pilha.getTopo())) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.CMA.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] > M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
+                if (pilha.getValor(pilha.getTopo() - 1) > pilha.getValor(pilha.getTopo())) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.CMAQ.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] ≥ M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
+                if (pilha.getValor(pilha.getTopo() - 1) >= pilha.getValor(pilha.getTopo())) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.CMEQ.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] ≤ M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
+                if (pilha.getValor(pilha.getTopo() - 1) <= pilha.getValor(pilha.getTopo())) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.CEQ.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] = M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
+                if (pilha.getValor(pilha.getTopo() - 1) == pilha.getValor(pilha.getTopo())) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.CDIF.toString())) {
-                // TODO implementar as logicas de cada comando
                 // se M[s-1] ≠ M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
+                if (pilha.getValor(pilha.getTopo() - 1) != pilha.getValor(pilha.getTopo())) {
+                    pilha.inserePilha(pilha.getTopo() - 1, 1);
+                } else {
+                    pilha.inserePilha(pilha.getTopo() - 1, 0);
+                }
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.STR.toString())) {
                 // M[n]:=M[s]
                 pilha.inserePilha(Integer.parseInt(param1), pilha.getValor(pilha.getTopo()));
                 // s:=s-1
                 pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.JMP.toString())) {
-                // TODO implementar as logicas de cada comando
                 // i:= t
+                int posicao = verificaLabel(arquivo, param1);
+                if (posicao == -1) {
+                    break;
+                }
+                i = posicao;
             } else if(comando.equals(EnumInstrucoes.JMPF.toString())) {
-                // TODO implementar as logicas de cada comando
                 //se M[s] = 0 então i:=t senão i:=i + 1;
                 // s:=s-1
+                if (pilha.getValor(pilha.getTopo()) == 0) {
+                    int posicao = verificaLabel(arquivo, param1);
+                    if (posicao == -1) {
+                        break;
+                    }
+                    i = posicao;
+                }
             } else if(comando.equals(EnumInstrucoes.NULL.toString())) {
-                // TODO implementar as logicas de cada comando
-
+                //continue;
             } else if(comando.equals(EnumInstrucoes.RD.toString())) {
-                // TODO implementar as logicas de cada comando
                 // S:=s + 1; M[s]:= “próximo valor de entrada”.
+                pilha.incrementaTopo();
+
+                String input = displayInput(virtualMachine);
+
+                if ((input != null) && (input.length() > 0)) {
+                    pilha.inserePilha(pilha.getTopo(), Integer.parseInt(input));
+                } else {
+                    System.out.println("Usuario nao digitou valor de entrada");
+                    break;
+                }
+
             } else if(comando.equals(EnumInstrucoes.PRN.toString())) {
-                // TODO implementar as logicas de cada comando
                 // “Imprimir M[s]”; s:=s-1
+                virtualMachine.writeOutput(String.valueOf(pilha.getValor(pilha.getTopo())));
+                pilha.decrementaTopo();
             } else if(comando.equals(EnumInstrucoes.ALLOC.toString())) {
-                // TODO implementar as logicas de cada comando
                 //Para k:=0 até n-1 faça
                 // {s:=s + 1; M[s]:=M[m+k]}
+                for (int k=0; k <= Integer.parseInt(param2) - 1 ; k++) {
+                    pilha.incrementaTopo();
+                    pilha.inserePilha(pilha.getTopo(), pilha.getValor(Integer.parseInt(param1) + k));
+                }
             } else if(comando.equals(EnumInstrucoes.DALLOC.toString())) {
-                // TODO implementar as logicas de cada comando
                 // Para k:=n-1 até 0 faça
                 // {M[m+k]:=M[s]; s:=s - 1}
+                for (int k=Integer.parseInt(param2) - 1; k >= 0; k--) {
+                    pilha.inserePilha(Integer.parseInt(param1) + k, pilha.getValor(pilha.getTopo()));
+                    pilha.decrementaTopo();
+                }
             } else if(comando.equals(EnumInstrucoes.CALL.toString())) {
-                // TODO implementar as logicas de cada comando
                 // S:=s + 1; M[s]:=i + 1; i:=t
+                pilha.incrementaTopo();
+                pilha.inserePilha(pilha.getTopo(), i + 1);
+                int posicao = verificaLabel(arquivo, param1);
+                if (posicao == -1) {
+                    break;
+                }
+                i = posicao;
             } else if(comando.equals(EnumInstrucoes.RETURN.toString())) {
-                // TODO implementar as logicas de cada comando
                 // i:=M[s]; s:=s - 1
+                i = pilha.getValor(pilha.getTopo());
+                pilha.decrementaTopo();
             }
         }
-
+        System.out.println("Valor da topo > " + pilha.getTopo());
         for(int i=0 ; i <= pilha.getTopo() ; i++) {
             System.out.println("Valor da pilha > " + pilha.getValor(i));
             Object[] palavra = new Object[] {i, pilha.getValor(i)};
@@ -207,12 +273,35 @@ public class Arquivo extends JFileChooser {
 
     }
 
+    private int verificaLabel(ArrayList<String> arquivo, String label) {
+        for(int i = 0 ; i <= arquivo.size() ; i++) {
+            String comando = getPalavra(i, 0);
+            if (comando.equals(label)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private Object[] adicionaElemento(Object[] obj, Object newObj) {
 
         ArrayList<Object> temp = new ArrayList<>(Arrays.asList(obj));
         temp.add(newObj);
         return temp.toArray();
 
+    }
+
+    private String displayInput(VM virtualMachine) {
+        String input = (String)JOptionPane.showInputDialog(
+                virtualMachine,
+                "Digite um valor de entrada:\n",
+                "Valor de entrada",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                null);
+
+        return input;
     }
 
     public void fechar() {

@@ -83,14 +83,14 @@ public class VM extends JFrame {
     private void menuItemCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
         //System.out.println("ARQUIVO> " + listArquivo);
-        new Arquivo(tablePilha, false, listArquivo);
+        new Arquivo(tablePilha, false, listArquivo, this);
     }
 
     private void menuItemDebuggarActionPerformed(ActionEvent e) {
         // TODO add your code here
         //System.out.println("ARQUIVO> " + listArquivo);
         btnContinuar.setEnabled(true);
-        new Arquivo(tablePilha, true, listArquivo);
+        new Arquivo(tablePilha, true, listArquivo, this);
     }
 
     @SuppressWarnings("unchecked")
@@ -239,7 +239,6 @@ public class VM extends JFrame {
                     {
 
                         //---- textAreaEntrada ----
-                        textAreaEntrada.setText("Input test");
                         scrollEntrada.setViewportView(textAreaEntrada);
                     }
                     panel4.add(scrollEntrada, BorderLayout.CENTER);
@@ -263,7 +262,6 @@ public class VM extends JFrame {
                     {
 
                         //---- textAreaSaida ----
-                        textAreaSaida.setText("Output test");
                         scrollSaida.setViewportView(textAreaSaida);
                     }
                     panel5.add(scrollSaida, BorderLayout.CENTER);
@@ -287,7 +285,6 @@ public class VM extends JFrame {
                     {
 
                         //---- textAreaBreakPoints ----
-                        textAreaBreakPoints.setText("Break point #1");
                         scrollBreakPoints.setViewportView(textAreaBreakPoints);
                     }
                     panel6.add(scrollBreakPoints, BorderLayout.CENTER);
@@ -374,4 +371,12 @@ public class VM extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 
     private JFileChooser jFileChooser;
+
+    public void writeOutput(String valor) {
+        textAreaSaida.setText(textAreaSaida.getText() + "\n" + valor);
+    }
+
+    public void clearOutput() {
+        textAreaSaida.setText("");
+    }
 }
