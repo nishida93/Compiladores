@@ -5,6 +5,7 @@
 package com.puc.compiladores.ui;
 
 import com.puc.compiladores.infrastructure.Arquivo;
+import com.puc.compiladores.infrastructure.Pilha;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,6 +29,7 @@ public class VM extends JFrame {
     private DefaultTableModel modelTabelaPilha = new DefaultTableModel();
     private ArrayList<String> listArquivo;
     private int linha = 0;
+    private Pilha affPilha = new Pilha();
 
     public VM() {
         jFileChooser = new JFileChooser();
@@ -80,7 +82,9 @@ public class VM extends JFrame {
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
         Arquivo arquivo = new Arquivo();
-        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha, listArquivo, this, linha);
+        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
+                listArquivo, this, linha, affPilha);
+        System.out.println("AUX = " + aux);
         if(aux == -99) {
             System.out.println("tem que parar!");
         }else if(aux == -98) {
@@ -102,7 +106,9 @@ public class VM extends JFrame {
         //System.out.println("ARQUIVO> " + listArquivo);
         btnContinuar.setEnabled(true);
         Arquivo arquivo = new Arquivo();
-        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha, listArquivo, this, linha);
+        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
+                listArquivo, this, linha, affPilha);
+        System.out.println("AUX = " + aux);
         if(aux == -99) {
             System.out.println("tem que parar!");
         }else if(aux == -98) {
