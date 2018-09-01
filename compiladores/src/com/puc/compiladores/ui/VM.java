@@ -27,6 +27,7 @@ public class VM extends JFrame {
     private DefaultTableModel modelTabelaInstrucoes = new DefaultTableModel();
     private DefaultTableModel modelTabelaPilha = new DefaultTableModel();
     private ArrayList<String> listArquivo;
+    private int linha = 0;
 
     public VM() {
         jFileChooser = new JFileChooser();
@@ -78,6 +79,16 @@ public class VM extends JFrame {
 
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
+        Arquivo arquivo = new Arquivo();
+        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha, listArquivo, this, linha);
+        if(aux == -99) {
+            System.out.println("tem que parar!");
+        }else if(aux == -98) {
+            System.out.println("tem que continuar");
+            linha++;
+        }else {
+            linha = aux;
+        }
     }
 
     private void menuItemCompilarActionPerformed(ActionEvent e) {
@@ -90,7 +101,16 @@ public class VM extends JFrame {
         // TODO add your code here
         //System.out.println("ARQUIVO> " + listArquivo);
         btnContinuar.setEnabled(true);
-        new Arquivo(tablePilha, true, listArquivo, this);
+        Arquivo arquivo = new Arquivo();
+        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha, listArquivo, this, linha);
+        if(aux == -99) {
+            System.out.println("tem que parar!");
+        }else if(aux == -98) {
+            linha++;
+        }else {
+            linha = aux;
+        }
+        //new Arquivo(tablePilha, true, listArquivo, this);
     }
 
     @SuppressWarnings("unchecked")
@@ -101,8 +121,6 @@ public class VM extends JFrame {
         modelTabelaInstrucoes.addColumn("Atributo #1");
         modelTabelaInstrucoes.addColumn("Atributo #2");
         modelTabelaInstrucoes.addColumn("Comentário");
-
-
         modelTabelaPilha.addColumn("Endereço[S]");
         modelTabelaPilha.addColumn("Valor");
 
@@ -168,10 +186,7 @@ public class VM extends JFrame {
 
                 //---- menuItemCompilar ----
                 menuItemCompilar.setText("Compilar");
-                menuItemCompilar.addActionListener(e -> {
-			btnCompilarActionPerformed(e);
-			menuItemCompilarActionPerformed(e);
-		});
+                menuItemCompilar.addActionListener(e -> menuItemCompilarActionPerformed(e));
                 menuExecutar.add(menuItemCompilar);
 
                 //---- menuItemDebuggar ----
@@ -294,6 +309,7 @@ public class VM extends JFrame {
                 //---- btnContinuar ----
                 btnContinuar.setText("Continuar");
                 btnContinuar.setActionCommand("Continuar");
+                btnContinuar.addActionListener(e -> btnCompilarActionPerformed(e));
                 panel3.add(btnContinuar, BorderLayout.SOUTH);
             }
             panel1.add(panel3, BorderLayout.SOUTH);
