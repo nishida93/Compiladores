@@ -29,7 +29,6 @@ public class Arquivo extends JFileChooser {
     public Arquivo(JTable instructionsTable, ArrayList<String> arquivo) {
         listArquivo = arquivo;
         populateTables(arquivo, instructionsTable);
-
     }
 
     public String getLinha(int index) {
@@ -78,7 +77,7 @@ public class Arquivo extends JFileChooser {
 
     public int stepByStep(JTable instructionsTable, JTable stackTable, ArrayList<String> arquivo,
                           VM virtualMachine, int linha, Pilha affPilha){
-        virtualMachine.clearOutput();
+        //virtualMachine.clearOutput();
         listArquivo = arquivo;
         DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
         clearAllRows(stackTableModel);
@@ -120,7 +119,6 @@ public class Arquivo extends JFileChooser {
                                  VM virtualMachine, int index, Pilha pilha) {
         DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
         clearAllRows(stackTableModel);
-        System.out.println("Topo da pilha > " + -1);
 
         String comando = getPalavra(index, 0);
         String param1 = getPalavra(index, 1).replaceAll(",", "");

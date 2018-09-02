@@ -67,18 +67,6 @@ public class VM extends JFrame {
         new Arquivo().fechar();
     }
 
-    private void menuCompilarActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void menu3ActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void menuItem2ActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
         Arquivo arquivo = new Arquivo();
@@ -87,6 +75,9 @@ public class VM extends JFrame {
         System.out.println("AUX = " + aux);
         if(aux == -99) {
             System.out.println("tem que parar!");
+            btnContinuar.setEnabled(false);
+            linha   = 0;
+            aux     = 0;
         }else if(aux == -98) {
             System.out.println("tem que continuar");
             linha++;
@@ -96,13 +87,10 @@ public class VM extends JFrame {
     }
 
     private void menuItemCompilarActionPerformed(ActionEvent e) {
-        // TODO add your code here
-        //System.out.println("ARQUIVO> " + listArquivo);
         new Arquivo(tablePilha, false, listArquivo, this);
     }
 
     private void menuItemDebuggarActionPerformed(ActionEvent e) {
-        // TODO add your code here
         //System.out.println("ARQUIVO> " + listArquivo);
         btnContinuar.setEnabled(true);
         Arquivo arquivo = new Arquivo();
@@ -181,7 +169,6 @@ public class VM extends JFrame {
 
                 //---- menuItemSair ----
                 menuItemSair.setText("Sair");
-                menuItemSair.addActionListener(e -> menuItem2ActionPerformed(e));
                 menuArquivo.add(menuItemSair);
             }
             menuBar.add(menuArquivo);
@@ -205,7 +192,6 @@ public class VM extends JFrame {
             //======== menuSobre ========
             {
                 menuSobre.setText("Sobre...");
-                menuSobre.addActionListener(e -> menu3ActionPerformed(e));
 
                 //---- menuItemSobre ----
                 menuItemSobre.setText("Sobre");
@@ -348,11 +334,6 @@ public class VM extends JFrame {
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
-
-
-
-
-
 
         btnContinuar.setEnabled(false);
     }

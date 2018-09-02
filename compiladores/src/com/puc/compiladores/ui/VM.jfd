@@ -111,6 +111,7 @@ new FormModel {
 						name: "btnContinuar"
 						"text": "Continuar"
 						"actionCommand": "Continuar"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnContinuarActionPerformed", true ) )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "South"
 					} )
