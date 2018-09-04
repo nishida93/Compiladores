@@ -58,8 +58,14 @@ public class Arquivo extends JFileChooser {
             Object[] palavra = new Object[] {i+1};
 
             String comando = getPalavra(i, 0);
-            String param1 = getPalavra(i, 1).replaceAll(",", "");
-            String param2 = getPalavra(i, 2).replaceAll(",", "");
+            String param1 = getPalavra(i, 1);
+            String param2 = getPalavra(i, 2);
+            if(comando.equals("ALLOC") || comando.equals("DALLOC"))
+            {
+                String[] params = getPalavra(i, 1).split(",");
+                param1 = params[0];
+                param2 = params[1];
+            }
 
             palavra = adicionaElemento(palavra, comando);
             palavra = adicionaElemento(palavra, param1);
@@ -76,15 +82,15 @@ public class Arquivo extends JFileChooser {
     }
 
     public int stepByStep(JTable instructionsTable, JTable stackTable, ArrayList<String> arquivo,
-                          VM virtualMachine, int linha, Pilha affPilha){
+                          VM virtualMachine, int linha, Pilha novaPilha){
         //virtualMachine.clearOutput();
         listArquivo = arquivo;
         DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
         clearAllRows(stackTableModel);
         instructionsTable.changeSelection(linha,0, false, false);
-        int aux = stepInstructions(stackTable, arquivo, virtualMachine, linha, affPilha);
-        System.out.println("Valor da topo > " + affPilha.getTopo());
-        populaPilhaPrint(stackTableModel, affPilha);
+        int aux = stepInstructions(stackTable, arquivo, virtualMachine, linha, novaPilha);
+        System.out.println("Valor da topo > " + novaPilha.getTopo());
+        populaPilhaPrint(stackTableModel, novaPilha);
         return aux;
     }
 
@@ -121,8 +127,14 @@ public class Arquivo extends JFileChooser {
         clearAllRows(stackTableModel);
 
         String comando = getPalavra(index, 0);
-        String param1 = getPalavra(index, 1).replaceAll(",", "");
-        String param2 = getPalavra(index, 1).replaceAll(",", "");
+        String param1 = getPalavra(index, 1);
+        String param2 = getPalavra(index, 2);
+        if(comando.equals("ALLOC") || comando.equals("DALLOC"))
+        {
+            String[] params = getPalavra(index, 1).split(",");
+            param1 = params[0];
+            param2 = params[1];
+        }
 
         if (comando.equals(EnumInstrucoes.START.toString())) {
             pilha.decrementaTopo(); // S:=-1
@@ -155,6 +167,7 @@ public class Arquivo extends JFileChooser {
             pilha.inserePilha(pilha.getTopo() - 1,
                     pilha.getValor(pilha.getTopo() - 1) / pilha.getValor(pilha.getTopo()));
             // s:=s - 1
+            pilha.decrementaTopo();
         } else if(comando.equals(EnumInstrucoes.INV.toString())) {
             // M[s]:= -M[s]
             pilha.inserePilha(pilha.getTopo(), -pilha.getValor(pilha.getTopo()));
@@ -252,9 +265,7 @@ public class Arquivo extends JFileChooser {
         } else if(comando.equals(EnumInstrucoes.RD.toString())) {
             // S:=s + 1; M[s]:= “próximo valor de entrada”.
             pilha.incrementaTopo();
-
             String input = displayInput(virtualMachine);
-
             if ((input != null) && (input.length() > 0)) {
                 pilha.inserePilha(pilha.getTopo(), Integer.parseInt(input));
             } else {
@@ -269,7 +280,7 @@ public class Arquivo extends JFileChooser {
         } else if(comando.equals(EnumInstrucoes.ALLOC.toString())) {
             //Para k:=0 até n-1 faça
             // {s:=s + 1; M[s]:=M[m+k]}
-            for (int k=0; k <= Integer.parseInt(param2) - 1 ; k++) {
+            for (int k=0; k < Integer.parseInt(param2); k++) {
                 pilha.incrementaTopo();
                 pilha.inserePilha(pilha.getTopo(), pilha.getValor(Integer.parseInt(param1) + k));
             }
@@ -283,6 +294,7 @@ public class Arquivo extends JFileChooser {
         } else if(comando.equals(EnumInstrucoes.CALL.toString())) {
             // S:=s + 1; M[s]:=i + 1; i:=t
             pilha.incrementaTopo();
+            System.out.println("index = " + index);
             pilha.inserePilha(pilha.getTopo(), index + 1);
             if (verificaLabel(arquivo, param1) == -1) {
                 return -99;
@@ -290,7 +302,7 @@ public class Arquivo extends JFileChooser {
             return verificaLabel(arquivo, param1);
         } else if(comando.equals(EnumInstrucoes.RETURN.toString())) {
             // i:=M[s]; s:=s - 1
-            index = pilha.getValor(pilha.getTopo());
+            index = pilha.getValor(pilha.getTopo() - 1);
             pilha.decrementaTopo();
             return index;
         }

@@ -110,6 +110,7 @@ public class VM extends JFrame {
     @SuppressWarnings("unchecked")
     private void initComponents(Container contentPane) {
 
+        //modelTabelaInstrucoes.addColumn("Debugger");
         modelTabelaInstrucoes.addColumn("Linha");
         modelTabelaInstrucoes.addColumn("Instrução");
         modelTabelaInstrucoes.addColumn("Atributo #1");
