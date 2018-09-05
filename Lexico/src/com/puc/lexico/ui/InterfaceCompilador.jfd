@@ -3,40 +3,49 @@ JFDML JFormDesigner: "6.0.4.0.167" Java: "1.8.0_152-release" encoding: "UTF-8"
 new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
-		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
 			name: "this"
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			"minimumSize": new java.awt.Dimension( 1200, 800 )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
 				name: "dialogPane"
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
-					"$layoutConstraints": "insets dialog,hidemode 3"
-					"$columnConstraints": "[fill][fill]"
-					"$rowConstraints": "[][][]"
-				} ) {
-					name: "contentPanel"
-				}, new FormLayoutConstraints( class java.lang.String ) {
-					"value": "Center"
-				} )
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
-					"$layoutConstraints": "insets dialog,alignx right"
-					"$columnConstraints": "[button,fill]"
-					"$rowSpecs": "[fill]"
-				} ) {
-					name: "buttonBar"
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "okButton"
-						"text": "OK"
-					}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-						"value": "cell 0 0"
+				"preferredSize": new java.awt.Dimension( 1200, 800 )
+				add( new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
+					name: "menuBar"
+					"minimumSize": new java.awt.Dimension( 1200, 3 )
+					"maximumSize": new java.awt.Dimension( 1200, 32769 )
+					"preferredSize": new java.awt.Dimension( 1200, 27 )
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "menuFile"
+						"text": "File"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "menuItemAbrir"
+							"text": "Abri..."
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "menuItemSalvar"
+							"text": "Salvar"
+						} )
 					} )
-				}, new FormLayoutConstraints( class java.lang.String ) {
-					"value": "South"
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "menuExecutar"
+						"text": "Executar"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "menuItemCompilar"
+							"text": "Compilar"
+						} )
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 0
+					"y": 0
+					"width": 1200
 				} )
-			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "Center"
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"width": 1200
+				"height": 715
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 400, 300 )
+			"size": new java.awt.Dimension( 1200, 635 )
 		} )
 	}
 }

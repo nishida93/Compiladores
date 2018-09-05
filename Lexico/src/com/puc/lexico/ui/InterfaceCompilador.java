@@ -6,7 +6,6 @@ package com.puc.lexico.ui;
 
 import java.awt.*;
 import javax.swing.*;
-import net.miginfocom.swing.*;
 
 /**
  * @author Luan Bonomi
@@ -20,16 +19,21 @@ public class InterfaceCompilador extends JFrame {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner Evaluation license - Luan Bonomi
         dialogPane = new JPanel();
-        contentPanel = new JPanel();
-        buttonBar = new JPanel();
-        okButton = new JButton();
+        menuBar = new JMenuBar();
+        menuFile = new JMenu();
+        menuItemAbrir = new JMenuItem();
+        menuItemSalvar = new JMenuItem();
+        menuExecutar = new JMenu();
+        menuItemCompilar = new JMenuItem();
 
         //======== this ========
+        setMinimumSize(new Dimension(1200, 800));
         Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
+        contentPane.setLayout(null);
 
         //======== dialogPane ========
         {
+            dialogPane.setPreferredSize(new Dimension(1200, 800));
 
             // JFormDesigner evaluation mark
             dialogPane.setBorder(new javax.swing.border.CompoundBorder(
@@ -38,38 +42,71 @@ public class InterfaceCompilador extends JFrame {
                     javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
                     java.awt.Color.red), dialogPane.getBorder())); dialogPane.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
 
-            dialogPane.setLayout(new BorderLayout());
+            dialogPane.setLayout(null);
 
-            //======== contentPanel ========
+            //======== menuBar ========
             {
-                contentPanel.setLayout(new MigLayout(
-                    "insets dialog,hidemode 3",
-                    // columns
-                    "[fill]" +
-                    "[fill]",
-                    // rows
-                    "[]" +
-                    "[]" +
-                    "[]"));
-            }
-            dialogPane.add(contentPanel, BorderLayout.CENTER);
+                menuBar.setMinimumSize(new Dimension(1200, 3));
+                menuBar.setMaximumSize(new Dimension(1200, 32769));
+                menuBar.setPreferredSize(new Dimension(1200, 27));
 
-            //======== buttonBar ========
-            {
-                buttonBar.setLayout(new MigLayout(
-                    "insets dialog,alignx right",
-                    // columns
-                    "[button,fill]",
-                    // rows
-                    null));
+                //======== menuFile ========
+                {
+                    menuFile.setText("File");
 
-                //---- okButton ----
-                okButton.setText("OK");
-                buttonBar.add(okButton, "cell 0 0");
+                    //---- menuItemAbrir ----
+                    menuItemAbrir.setText("Abri...");
+                    menuFile.add(menuItemAbrir);
+
+                    //---- menuItemSalvar ----
+                    menuItemSalvar.setText("Salvar");
+                    menuFile.add(menuItemSalvar);
+                }
+                menuBar.add(menuFile);
+
+                //======== menuExecutar ========
+                {
+                    menuExecutar.setText("Executar");
+
+                    //---- menuItemCompilar ----
+                    menuItemCompilar.setText("Compilar");
+                    menuExecutar.add(menuItemCompilar);
+                }
+                menuBar.add(menuExecutar);
             }
-            dialogPane.add(buttonBar, BorderLayout.SOUTH);
+            dialogPane.add(menuBar);
+            menuBar.setBounds(0, 0, 1200, menuBar.getPreferredSize().height);
+
+            { // compute preferred size
+                Dimension preferredSize = new Dimension();
+                for(int i = 0; i < dialogPane.getComponentCount(); i++) {
+                    Rectangle bounds = dialogPane.getComponent(i).getBounds();
+                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+                }
+                Insets insets = dialogPane.getInsets();
+                preferredSize.width += insets.right;
+                preferredSize.height += insets.bottom;
+                dialogPane.setMinimumSize(preferredSize);
+                dialogPane.setPreferredSize(preferredSize);
+            }
         }
-        contentPane.add(dialogPane, BorderLayout.CENTER);
+        contentPane.add(dialogPane);
+        dialogPane.setBounds(0, 0, 1200, 715);
+
+        { // compute preferred size
+            Dimension preferredSize = new Dimension();
+            for(int i = 0; i < contentPane.getComponentCount(); i++) {
+                Rectangle bounds = contentPane.getComponent(i).getBounds();
+                preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+            }
+            Insets insets = contentPane.getInsets();
+            preferredSize.width += insets.right;
+            preferredSize.height += insets.bottom;
+            contentPane.setMinimumSize(preferredSize);
+            contentPane.setPreferredSize(preferredSize);
+        }
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -78,8 +115,11 @@ public class InterfaceCompilador extends JFrame {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Luan Bonomi
     private JPanel dialogPane;
-    private JPanel contentPanel;
-    private JPanel buttonBar;
-    private JButton okButton;
+    private JMenuBar menuBar;
+    private JMenu menuFile;
+    private JMenuItem menuItemAbrir;
+    private JMenuItem menuItemSalvar;
+    private JMenu menuExecutar;
+    private JMenuItem menuItemCompilar;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
