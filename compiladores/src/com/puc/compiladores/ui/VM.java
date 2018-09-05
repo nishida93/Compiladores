@@ -93,6 +93,7 @@ public class VM extends JFrame {
         //System.out.println("ARQUIVO> " + listArquivo);
         linha = 0;
         clearOutput();
+        btnContinuar.setEnabled(true);
         btnCompilarActionPerformed(e);
         //new Arquivo(tablePilha, true, listArquivo, this);
     }
