@@ -76,8 +76,7 @@ public class VM extends JFrame {
         if(aux == -99) {
             System.out.println("tem que parar!");
             btnContinuar.setEnabled(false);
-            linha   = 0;
-            aux     = 0;
+            linha = 0;
         }else if(aux == -98) {
             System.out.println("tem que continuar");
             linha++;
@@ -92,18 +91,9 @@ public class VM extends JFrame {
 
     private void menuItemDebuggarActionPerformed(ActionEvent e) {
         //System.out.println("ARQUIVO> " + listArquivo);
-        btnContinuar.setEnabled(true);
-        Arquivo arquivo = new Arquivo();
-        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
-                listArquivo, this, linha, affPilha);
-        System.out.println("AUX = " + aux);
-        if(aux == -99) {
-            System.out.println("tem que parar!");
-        }else if(aux == -98) {
-            linha++;
-        }else {
-            linha = aux;
-        }
+        linha = 0;
+        clearOutput();
+        btnCompilarActionPerformed(e);
         //new Arquivo(tablePilha, true, listArquivo, this);
     }
 

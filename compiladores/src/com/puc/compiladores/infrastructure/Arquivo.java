@@ -83,7 +83,6 @@ public class Arquivo extends JFileChooser {
 
     public int stepByStep(JTable instructionsTable, JTable stackTable, ArrayList<String> arquivo,
                           VM virtualMachine, int linha, Pilha novaPilha){
-        //virtualMachine.clearOutput();
         listArquivo = arquivo;
         DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
         clearAllRows(stackTableModel);
@@ -260,6 +259,7 @@ public class Arquivo extends JFileChooser {
                 }
                 return verificaLabel(arquivo, param1);
             }
+            pilha.decrementaTopo();
         } else if(comando.equals(EnumInstrucoes.NULL.toString())) {
             //continue;
         } else if(comando.equals(EnumInstrucoes.RD.toString())) {
@@ -302,7 +302,7 @@ public class Arquivo extends JFileChooser {
             return verificaLabel(arquivo, param1);
         } else if(comando.equals(EnumInstrucoes.RETURN.toString())) {
             // i:=M[s]; s:=s - 1
-            index = pilha.getValor(pilha.getTopo() - 1);
+            index = pilha.getValor(pilha.getTopo()) - 1;
             pilha.decrementaTopo();
             return index;
         }
