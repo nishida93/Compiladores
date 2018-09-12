@@ -45,17 +45,30 @@ public class Arquivo extends JFileChooser {
             return palavra[indexPalavra];
         } catch (ArrayIndexOutOfBoundsException e) {
             // Caso nao exista o index, retorna String vazia
-            System.out.println("Error index >>> " + e.getMessage());
+            //System.out.println("Error index >>> " + e.getMessage());
             return "";
         }
+    }
 
+    public int debuggar(JTable instructionsTable, JTable stackTable, ArrayList<String> arquivo,
+                         VM virtualMachine, int linha, Pilha novaPilha) {
+
+        int i = 0;
+        String input = displayInput(virtualMachine);
+        for(i = 0; i < arquivo.size(); i++){
+            if(i == Integer.parseInt(input)) {
+                return i;
+            }
+            stepByStep(instructionsTable, stackTable, arquivo, virtualMachine, linha, novaPilha);
+        }
+        return i;
     }
 
     private void populateTables(ArrayList<String> arquivo, JTable instructionsTable) {
         DefaultTableModel model = (DefaultTableModel) instructionsTable.getModel();
         clearAllRows(model);
         for(int i=0 ; i < arquivo.size() ; i++) {
-            Object[] palavra = new Object[] {i+1};
+            Object[] palavra = new Object[] {i};
 
             String comando = getPalavra(i, 0);
             String param1 = getPalavra(i, 1);
@@ -73,6 +86,8 @@ public class Arquivo extends JFileChooser {
             model.addRow(palavra);
         }
     }
+
+
 
     private void clearAllRows(DefaultTableModel model) {
         model.getRowCount();
@@ -114,6 +129,27 @@ public class Arquivo extends JFileChooser {
                 continue;
             }else {
                 i = aux;
+            }
+        }
+        System.out.println("Valor da topo > " + pilha.getTopo());
+        populaPilhaPrint(stackTableModel, pilha);
+    }
+
+    private void populaBreakPoints(JTable stackTable, ArrayList<String> arquivo, VM virtualMachine, int breakPoints) {
+        DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
+        clearAllRows(stackTableModel);
+        for(int i=0 ; i < arquivo.size() ; i++) {
+            if(i == breakPoints){
+
+            } else {
+                int aux = stepInstructions(stackTable, arquivo, virtualMachine, i, pilha);
+                if(aux == -99) {
+                    break;
+                }else if(aux == -98) {
+                    continue;
+                }else {
+                    i = aux;
+                }
             }
         }
         System.out.println("Valor da topo > " + pilha.getTopo());
@@ -302,7 +338,7 @@ public class Arquivo extends JFileChooser {
             return verificaLabel(arquivo, param1);
         } else if(comando.equals(EnumInstrucoes.RETURN.toString())) {
             // i:=M[s]; s:=s - 1
-            index = pilha.getValor(pilha.getTopo()) - 1;
+            index = pilha.getValor(pilha.getTopo());
             pilha.decrementaTopo();
             return index;
         }
