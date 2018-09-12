@@ -94,24 +94,10 @@ public class VM extends JFrame {
     }
 
     private void menuItemStepByStepActionPerformed(ActionEvent e) {
-        //System.out.println("ARQUIVO> " + listArquivo);
         linha = 0;
         clearOutput();
         btnContinuar.setEnabled(true);
         btnCompilarActionPerformed(e);
-        //new Arquivo(tablePilha, true, listArquivo, this);
-    }
-
-    private void menuItem2ActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void menu3ActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void btnContinuarActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     @SuppressWarnings("unchecked")
@@ -141,7 +127,7 @@ public class VM extends JFrame {
         panel1 = new JPanel();
         lblInstrucoes = new JLabel();
         scrollTabelaInstrucoes = new JScrollPane();
-        tableInstrucoes = new JTable();
+        tableInstrucoes = new JTable(modelTabelaInstrucoes);
         panel3 = new JPanel();
         panel5 = new JPanel();
         lblSaida = new JLabel();
@@ -151,7 +137,7 @@ public class VM extends JFrame {
         panel2 = new JPanel();
         lblPilha = new JLabel();
         scrollPilha = new JScrollPane();
-        tablePilha = new JTable();
+        tablePilha = new JTable(modelTabelaPilha);
 
         //======== this ========
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
@@ -170,7 +156,6 @@ public class VM extends JFrame {
 
                 //---- menuItemSair ----
                 menuItemSair.setText("Sair");
-                menuItemSair.addActionListener(e -> menuItem2ActionPerformed(e));
                 menuArquivo.add(menuItemSair);
             }
             menuBar.add(menuArquivo);
@@ -181,10 +166,7 @@ public class VM extends JFrame {
 
                 //---- menuItemCompilar ----
                 menuItemCompilar.setText("Compilar");
-                menuItemCompilar.addActionListener(e -> {
-			btnCompilarActionPerformed(e);
-			menuItemCompilarActionPerformed(e);
-		});
+                menuItemCompilar.addActionListener(e -> menuItemCompilarActionPerformed(e));
                 menuExecutar.add(menuItemCompilar);
 
                 //---- menuItemDebuggar ----
@@ -194,6 +176,7 @@ public class VM extends JFrame {
 
                 //---- menuItemStepByStep ----
                 menuItemStepByStep.setText("Step by Step");
+                menuItemStepByStep.addActionListener(e -> menuItemStepByStepActionPerformed(e));
                 menuExecutar.add(menuItemStepByStep);
             }
             menuBar.add(menuExecutar);
@@ -201,7 +184,6 @@ public class VM extends JFrame {
             //======== menuSobre ========
             {
                 menuSobre.setText("Sobre...");
-                menuSobre.addActionListener(e -> menu3ActionPerformed(e));
 
                 //---- menuItemSobre ----
                 menuItemSobre.setText("Sobre");
@@ -216,14 +198,6 @@ public class VM extends JFrame {
         {
             panel1.setPreferredSize(new Dimension(600, 2216));
             panel1.setBorder(LineBorder.createBlackLineBorder());
-
-            // JFormDesigner evaluation mark
-            panel1.setBorder(new javax.swing.border.CompoundBorder(
-                new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0),
-                    "JFormDesigner Evaluation", javax.swing.border.TitledBorder.CENTER,
-                    javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
-                    java.awt.Color.red), panel1.getBorder())); panel1.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
-
             panel1.setLayout(new BorderLayout());
 
             //---- lblInstrucoes ----
@@ -263,7 +237,6 @@ public class VM extends JFrame {
                     {
 
                         //---- textAreaSaida ----
-                        textAreaSaida.setText("Output test");
                         scrollSaida.setViewportView(textAreaSaida);
                     }
                     panel5.add(scrollSaida, BorderLayout.CENTER);
@@ -273,7 +246,7 @@ public class VM extends JFrame {
                 //---- btnContinuar ----
                 btnContinuar.setText("Continuar");
                 btnContinuar.setActionCommand("Continuar");
-                btnContinuar.addActionListener(e -> btnContinuarActionPerformed(e));
+                btnContinuar.addActionListener(e -> btnCompilarActionPerformed(e));
                 panel3.add(btnContinuar, BorderLayout.SOUTH);
             }
             panel1.add(panel3, BorderLayout.SOUTH);
