@@ -45,7 +45,6 @@ public class VM extends JFrame {
     }
 
     private void menuItem1ActionPerformed(ActionEvent e) {
-
         JFileChooser fileChooser = new JFileChooser();
         listArquivo = new ArrayList<>();
         int result = fileChooser.showOpenDialog(this);
@@ -60,7 +59,6 @@ public class VM extends JFrame {
             }
         }
         new Arquivo(tableInstrucoes, listArquivo);
-
     }
 
     private void btnCompilarActionPerformed(ActionEvent e) {
@@ -87,10 +85,34 @@ public class VM extends JFrame {
 
     private void menuItemDebuggarActionPerformed(ActionEvent e) {
         linha = 0;
+        Arquivo arquivo = new Arquivo();
+        int checkout = arquivo.debuggar(this);
+        int tamanho = arquivo.getTamanhoArquivo(listArquivo);
         clearOutput();
         btnContinuar.setEnabled(true);
-        new Arquivo().debuggar(tableInstrucoes, tablePilha,
-                listArquivo, this, linha, pilhaNova);
+        for(int i = 0; i < tamanho; i++) {
+            if(i == checkout) {
+                System.out.println("entrou");
+                btnCompilarActionPerformed(e);
+            } else{
+            //tableInstrucoes, tablePilha,
+            //                listArquivo, this, linha, pilhaNova
+                int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
+                        listArquivo, this, i, pilhaNova);
+                System.out.println("AUX = " + aux);
+                if(aux == -99) {
+                    System.out.println("tem que parar!");
+                    btnContinuar.setEnabled(false);
+                    linha = 0;
+                }else if(aux == -98) {
+                    System.out.println("tem que continuar");
+                    linha++;
+                }else {
+                    linha = aux;
+                }
+            }
+        }
+
     }
 
     private void menuItemStepByStepActionPerformed(ActionEvent e) {
