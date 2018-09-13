@@ -26,6 +26,10 @@ public class Arquivo extends JFileChooser {
         populateStackTable(stackTable, arquivo, virtualMachine);
     }
 
+    public int getTamanhoArquivo(ArrayList<String> arquivo) {
+        return arquivo.size();
+    }
+
     public Arquivo(JTable instructionsTable, ArrayList<String> arquivo) {
         listArquivo = arquivo;
         populateTables(arquivo, instructionsTable);
@@ -50,18 +54,9 @@ public class Arquivo extends JFileChooser {
         }
     }
 
-    public int debuggar(JTable instructionsTable, JTable stackTable, ArrayList<String> arquivo,
-                         VM virtualMachine, int linha, Pilha novaPilha) {
-
-        int i = 0;
+    public int debuggar(VM virtualMachine) {
         String input = displayInput(virtualMachine);
-        for(i = 0; i < arquivo.size(); i++){
-            if(i == Integer.parseInt(input)) {
-                return i;
-            }
-            stepByStep(instructionsTable, stackTable, arquivo, virtualMachine, linha, novaPilha);
-        }
-        return i;
+        return Integer.parseInt(input);
     }
 
     private void populateTables(ArrayList<String> arquivo, JTable instructionsTable) {
@@ -87,8 +82,6 @@ public class Arquivo extends JFileChooser {
         }
     }
 
-
-
     private void clearAllRows(DefaultTableModel model) {
         model.getRowCount();
         for (int i = model.getRowCount() - 1; i >= 0; i--) {
@@ -103,14 +96,14 @@ public class Arquivo extends JFileChooser {
         clearAllRows(stackTableModel);
         instructionsTable.changeSelection(linha,0, false, false);
         int aux = stepInstructions(stackTable, arquivo, virtualMachine, linha, novaPilha);
-        System.out.println("Valor da topo > " + novaPilha.getTopo());
+//        System.out.println("Valor da topo > " + novaPilha.getTopo());
         populaPilhaPrint(stackTableModel, novaPilha);
         return aux;
     }
 
     private void populaPilhaPrint(DefaultTableModel stackTableModel, Pilha pilha) {
         for(int i=0 ; i <= pilha.getTopo() ; i++) {
-            System.out.println("Valor da pilha > " + pilha.getValor(i));
+//            System.out.println("Valor da pilha > " + pilha.getValor(i));
             Object[] palavra = new Object[] {i, pilha.getValor(i)};
             palavra = adicionaElemento(palavra, palavra);
             stackTableModel.addRow(palavra);
@@ -135,25 +128,14 @@ public class Arquivo extends JFileChooser {
         populaPilhaPrint(stackTableModel, pilha);
     }
 
-    private void populaBreakPoints(JTable stackTable, ArrayList<String> arquivo, VM virtualMachine, int breakPoints) {
+    public int populaBreakPoints(JTable stackTable, ArrayList<String> arquivo,
+                                   VM virtualMachine, int linha) {
         DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
         clearAllRows(stackTableModel);
-        for(int i=0 ; i < arquivo.size() ; i++) {
-            if(i == breakPoints){
-
-            } else {
-                int aux = stepInstructions(stackTable, arquivo, virtualMachine, i, pilha);
-                if(aux == -99) {
-                    break;
-                }else if(aux == -98) {
-                    continue;
-                }else {
-                    i = aux;
-                }
-            }
-        }
+        int aux = stepInstructions(stackTable, arquivo, virtualMachine, linha, pilha);
         System.out.println("Valor da topo > " + pilha.getTopo());
         populaPilhaPrint(stackTableModel, pilha);
+        return aux;
     }
 
     private int stepInstructions(JTable stackTable, ArrayList<String> arquivo,
