@@ -16,16 +16,6 @@ public class Arquivo extends JFileChooser {
 
     public Arquivo() {}
 
-    public Arquivo(JTable stackTable, boolean isDebug, ArrayList<String> arquivo, VM virtualMachine) {
-        virtualMachine.clearOutput();
-        listArquivo = arquivo;
-        System.out.println(arquivo);
-        if(isDebug) {
-            System.out.println("Eh modo debug");
-        }
-        populateStackTable(stackTable, arquivo, virtualMachine);
-    }
-
     public int getTamanhoArquivo(ArrayList<String> arquivo) {
         return arquivo.size();
     }
@@ -54,9 +44,9 @@ public class Arquivo extends JFileChooser {
         }
     }
 
-    public int debuggar(VM virtualMachine) {
+    public String debuggar(VM virtualMachine) {
         String input = displayInput(virtualMachine);
-        return Integer.parseInt(input);
+        return input;
     }
 
     private void populateTables(ArrayList<String> arquivo, JTable instructionsTable) {
@@ -64,7 +54,6 @@ public class Arquivo extends JFileChooser {
         clearAllRows(model);
         for(int i=0 ; i < arquivo.size() ; i++) {
             Object[] palavra = new Object[] {i};
-
             String comando = getPalavra(i, 0);
             String param1 = getPalavra(i, 1);
             String param2 = getPalavra(i, 2);
@@ -74,7 +63,6 @@ public class Arquivo extends JFileChooser {
                 param1 = params[0];
                 param2 = params[1];
             }
-
             palavra = adicionaElemento(palavra, comando);
             palavra = adicionaElemento(palavra, param1);
             palavra = adicionaElemento(palavra, param2);
@@ -110,33 +98,15 @@ public class Arquivo extends JFileChooser {
         }
     }
 
-
-    private void populateStackTable(JTable stackTable, ArrayList<String> arquivo, VM virtualMachine) {
-        DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
-        clearAllRows(stackTableModel);
-        for(int i=0 ; i < arquivo.size() ; i++) {
-            int aux = stepInstructions(stackTable, arquivo, virtualMachine, i, pilha);
-            if(aux == -99) {
-                break;
-            }else if(aux == -98) {
-                continue;
-            }else {
-                i = aux;
-            }
-        }
-        System.out.println("Valor da topo > " + pilha.getTopo());
-        populaPilhaPrint(stackTableModel, pilha);
-    }
-
-    public int populaBreakPoints(JTable stackTable, ArrayList<String> arquivo,
-                                   VM virtualMachine, int linha) {
-        DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
-        clearAllRows(stackTableModel);
-        int aux = stepInstructions(stackTable, arquivo, virtualMachine, linha, pilha);
-        System.out.println("Valor da topo > " + pilha.getTopo());
-        populaPilhaPrint(stackTableModel, pilha);
-        return aux;
-    }
+//    public int populaBreakPoints(JTable stackTable, ArrayList<String> arquivo,
+//                                   VM virtualMachine, int linha) {
+//        DefaultTableModel stackTableModel = (DefaultTableModel) stackTable.getModel();
+//        clearAllRows(stackTableModel);
+//        int aux = stepInstructions(stackTable, arquivo, virtualMachine, linha, pilha);
+//        System.out.println("Valor da topo > " + pilha.getTopo());
+//        populaPilhaPrint(stackTableModel, pilha);
+//        return aux;
+//    }
 
     private int stepInstructions(JTable stackTable, ArrayList<String> arquivo,
                                  VM virtualMachine, int index, Pilha pilha) {
@@ -275,6 +245,7 @@ public class Arquivo extends JFileChooser {
                 if (verificaLabel(arquivo, param1) == -1) {
                     return -99;
                 }
+                pilha.decrementaTopo();
                 return verificaLabel(arquivo, param1);
             }
             pilha.decrementaTopo();
