@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.*;
@@ -64,6 +65,10 @@ public class VM extends JFrame {
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
         Arquivo arquivo = new Arquivo();
+        int aux = executaTudo(arquivo);
+    }
+
+    private int executaTudo(Arquivo arquivo) {
         int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
                 listArquivo, this, linha, pilhaNova);
         System.out.println("AUX = " + aux);
@@ -77,42 +82,60 @@ public class VM extends JFrame {
         }else {
             linha = aux;
         }
+        return aux;
     }
 
     private void menuItemCompilarActionPerformed(ActionEvent e) {
-        new Arquivo(tablePilha, false, listArquivo, this);
+        linha = 0;
+        clearOutput();
+        btnContinuar.setEnabled(false);
+        Arquivo arquivo = new Arquivo();
+        int aux = 0;
+        while (aux != -99){
+            aux = executaTudo(arquivo);
+        }
     }
 
-    private void menuItemDebuggarActionPerformed(ActionEvent e) {
+    private void menuItemDebuggarActionPerformed(ActionEvent e, int inicio) {
         linha = 0;
         Arquivo arquivo = new Arquivo();
-        int checkout = arquivo.debuggar(this);
-        int tamanho = arquivo.getTamanhoArquivo(listArquivo);
-        clearOutput();
-        btnContinuar.setEnabled(true);
-        for(int i = 0; i < tamanho; i++) {
-            if(i == checkout) {
-                System.out.println("entrou");
-                btnCompilarActionPerformed(e);
-            } else{
-            //tableInstrucoes, tablePilha,
-            //                listArquivo, this, linha, pilhaNova
-                int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
-                        listArquivo, this, i, pilhaNova);
-                System.out.println("AUX = " + aux);
-                if(aux == -99) {
-                    System.out.println("tem que parar!");
-                    btnContinuar.setEnabled(false);
-                    linha = 0;
-                }else if(aux == -98) {
-                    System.out.println("tem que continuar");
-                    linha++;
-                }else {
-                    linha = aux;
-                }
-            }
+        String checkout = arquivo.debuggar(this);
+        List linhas = separaBreakPoints(checkout);
+        System.out.println(" o que veio = " + linhas.get(0));
+//        int tamanho = arquivo.getTamanhoArquivo(listArquivo);
+//        clearOutput();
+//        btnContinuar.setEnabled(true);
+//        for(int i = inicio; i < tamanho; i++) {
+//            if(i == checkout) {
+//                System.out.println("entrou");
+//                menuItemDebuggarActionPerformed(e, linha);
+//                break;
+//            } else{
+//                int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
+//                        listArquivo, this, i, pilhaNova);
+//                System.out.println("AUX = " + aux);
+//                if(aux == -99) {
+//                    System.out.println("tem que parar!");
+//                    btnContinuar.setEnabled(false);
+//                    linha = 0;
+//                }else if(aux == -98) {
+//                    System.out.println("tem que continuar");
+//                    linha++;
+//                }else {
+//                    linha = aux;
+//                }
+//            }
+//        }
+    }
+
+    private List separaBreakPoints(String breakpoints) {
+        List linhas = new ArrayList();
+
+        for(int i = 0; i < breakpoints.length(); i++){
+            linhas.add(breakpoints.split(" ")) ;
         }
 
+        return linhas;
     }
 
     private void menuItemStepByStepActionPerformed(ActionEvent e) {
@@ -193,7 +216,7 @@ public class VM extends JFrame {
 
                 //---- menuItemDebuggar ----
                 menuItemDebuggar.setText("Debuggar");
-                menuItemDebuggar.addActionListener(e -> menuItemDebuggarActionPerformed(e));
+                menuItemDebuggar.addActionListener(e -> menuItemDebuggarActionPerformed(e, 0));
                 menuExecutar.add(menuItemDebuggar);
 
                 //---- menuItemStepByStep ----
