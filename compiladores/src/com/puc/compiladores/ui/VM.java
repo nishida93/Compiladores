@@ -65,11 +65,11 @@ public class VM extends JFrame {
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
         Arquivo arquivo = new Arquivo();
-        int aux = executaTudo(arquivo);
+        int aux = executaTudo(arquivo, tablePilha);
     }
 
-    private int executaTudo(Arquivo arquivo) {
-        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
+    private int executaTudo(Arquivo arquivo, JTable tablePilhaNova) {
+        int aux = arquivo.stepByStep(tableInstrucoes, tablePilhaNova,
                 listArquivo, this, linha, pilhaNova);
         System.out.println("AUX = " + aux);
         if(aux == -99) {
@@ -92,50 +92,47 @@ public class VM extends JFrame {
         Arquivo arquivo = new Arquivo();
         int aux = 0;
         while (aux != -99){
-            aux = executaTudo(arquivo);
+            aux = executaTudo(arquivo, tablePilha);
         }
+    }
+
+    private String[] separaBreakPoints(String breakPoints) {
+        String[] params = breakPoints.split(" ");
+        return params;
     }
 
     private void menuItemDebuggarActionPerformed(ActionEvent e, int inicio) {
         linha = 0;
+        int k = 0;
+        btnContinuar.setEnabled(true);
+        clearOutput();
         Arquivo arquivo = new Arquivo();
         String checkout = arquivo.debuggar(this);
-        List linhas = separaBreakPoints(checkout);
-        System.out.println(" o que veio = " + linhas.get(0));
-//        int tamanho = arquivo.getTamanhoArquivo(listArquivo);
-//        clearOutput();
-//        btnContinuar.setEnabled(true);
-//        for(int i = inicio; i < tamanho; i++) {
-//            if(i == checkout) {
-//                System.out.println("entrou");
-//                menuItemDebuggarActionPerformed(e, linha);
-//                break;
-//            } else{
-//                int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
-//                        listArquivo, this, i, pilhaNova);
-//                System.out.println("AUX = " + aux);
-//                if(aux == -99) {
-//                    System.out.println("tem que parar!");
-//                    btnContinuar.setEnabled(false);
-//                    linha = 0;
-//                }else if(aux == -98) {
-//                    System.out.println("tem que continuar");
-//                    linha++;
-//                }else {
-//                    linha = aux;
-//                }
-//            }
+        String[] breakPoint = separaBreakPoints(checkout);
+        int tamanho = arquivo.getTamanhoArquivo(listArquivo);
+//        for(int i = 0; i < breakPoint.length; i++) {
+//            System.out.println("breakpoints" + i + "que veio = " + breakPoint[i]);
 //        }
-    }
-
-    private List separaBreakPoints(String breakpoints) {
-        List linhas = new ArrayList();
-
-        for(int i = 0; i < breakpoints.length(); i++){
-            linhas.add(breakpoints.split(" ")) ;
+        for(int i = 0; i < tamanho; i++) {
+            if(linha == Integer.parseInt(breakPoint[k])) {
+                int aux = executaTudo(arquivo, tablePilha);
+                k++;
+            } else {
+                int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
+                        listArquivo, this, i, pilhaNova);
+                System.out.println("AUX = " + aux);
+                if(aux == -99) {
+                    System.out.println("tem que parar!");
+                    btnContinuar.setEnabled(false);
+                    linha = 0;
+                }else if(aux == -98) {
+                    System.out.println("tem que continuar");
+                    linha++;
+                }else {
+                    linha = aux;
+                }
+            }
         }
-
-        return linhas;
     }
 
     private void menuItemStepByStepActionPerformed(ActionEvent e) {
