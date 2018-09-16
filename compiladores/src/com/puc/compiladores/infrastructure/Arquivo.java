@@ -57,8 +57,7 @@ public class Arquivo extends JFileChooser {
             String comando = getPalavra(i, 0);
             String param1 = getPalavra(i, 1);
             String param2 = getPalavra(i, 2);
-            if(comando.equals("ALLOC") || comando.equals("DALLOC"))
-            {
+            if(comando.equals("ALLOC") || comando.equals("DALLOC")) {
                 String[] params = getPalavra(i, 1).split(",");
                 param1 = params[0];
                 param2 = params[1];
