@@ -104,33 +104,22 @@ public class VM extends JFrame {
     private void menuItemDebuggarActionPerformed(ActionEvent e, int inicio) {
         linha = 0;
         int k = 0;
-        btnContinuar.setEnabled(true);
         clearOutput();
         Arquivo arquivo = new Arquivo();
         String checkout = arquivo.debuggar(this);
         String[] breakPoint = separaBreakPoints(checkout);
         int tamanho = arquivo.getTamanhoArquivo(listArquivo);
-//        for(int i = 0; i < breakPoint.length; i++) {
-//            System.out.println("breakpoints" + i + "que veio = " + breakPoint[i]);
-//        }
         for(int i = 0; i < tamanho; i++) {
-            if(linha == Integer.parseInt(breakPoint[k])) {
-                int aux = executaTudo(arquivo, tablePilha);
-                k++;
-            } else {
-                int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
-                        listArquivo, this, i, pilhaNova);
-                System.out.println("AUX = " + aux);
-                if(aux == -99) {
-                    System.out.println("tem que parar!");
-                    btnContinuar.setEnabled(false);
-                    linha = 0;
-                }else if(aux == -98) {
-                    System.out.println("tem que continuar");
-                    linha++;
-                }else {
-                    linha = aux;
+            if(k < breakPoint.length) {
+                if(linha == Integer.parseInt(breakPoint[k]) && null != breakPoint[k]) {
+                    int a = arquivo.btnContinuar(this);
+                    System.out.println("a = " + a);
+                    k++;
                 }
+            }
+            i = executaTudo(arquivo, tablePilha);
+            if(-99 == i){
+                break;
             }
         }
     }
