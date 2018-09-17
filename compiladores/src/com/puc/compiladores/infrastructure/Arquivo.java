@@ -49,6 +49,12 @@ public class Arquivo extends JFileChooser {
         return input;
     }
 
+    public int btnContinuar(VM virtualMachine) {
+        int result = JOptionPane.showConfirmDialog(virtualMachine,"Deseja continuar?",
+                "ok",JOptionPane.DEFAULT_OPTION);
+        return result;
+    }
+
     private void populateTables(ArrayList<String> arquivo, JTable instructionsTable) {
         DefaultTableModel model = (DefaultTableModel) instructionsTable.getModel();
         clearAllRows(model);
