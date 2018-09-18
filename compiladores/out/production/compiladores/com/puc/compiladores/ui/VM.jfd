@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "6.0.3.0.150" Java: "1.8.0_152-release" encoding: "UTF-8"
+JFDML JFormDesigner: "6.0.4.0.167" Java: "1.8.0_152-release" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -32,32 +32,6 @@ new FormModel {
 					name: "panel3"
 					"border": #LineBorder0
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
-						name: "panel4"
-						"preferredSize": new java.awt.Dimension( 200, 32 )
-						"foreground": new java.awt.Color( 153, 153, 153, 255 )
-						"border": #LineBorder0
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "lblEntrada"
-							"text": "Janela de Entrada"
-							"horizontalAlignment": 0
-							"font": new java.awt.Font( ".SF NS Text", 3, 13 )
-							"border": #LineBorder0
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "North"
-						} )
-						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollEntrada"
-							add( new FormComponent( "javax.swing.JTextArea" ) {
-								name: "textAreaEntrada"
-								"text": "Input test"
-							} )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "Center"
-						} )
-					}, new FormLayoutConstraints( class java.lang.String ) {
-						"value": "West"
-					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 						name: "panel5"
 						"preferredSize": new java.awt.Dimension( 200, 200 )
 						"border": #LineBorder0
@@ -82,35 +56,11 @@ new FormModel {
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "Center"
 					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
-						name: "panel6"
-						"preferredSize": new java.awt.Dimension( 200, 32 )
-						"border": #LineBorder0
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "lblBreakPoints"
-							"text": "Break Points"
-							"font": new java.awt.Font( ".SF NS Text", 3, 13 )
-							"horizontalAlignment": 0
-							"border": #LineBorder0
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "North"
-						} )
-						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollBreakPoints"
-							add( new FormComponent( "javax.swing.JTextArea" ) {
-								name: "textAreaBreakPoints"
-								"text": "Break point #1"
-							} )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "Center"
-						} )
-					}, new FormLayoutConstraints( class java.lang.String ) {
-						"value": "East"
-					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "btnContinuar"
 						"text": "Continuar"
 						"actionCommand": "Continuar"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnContinuarActionPerformed", true ) )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "South"
 					} )
@@ -170,6 +120,10 @@ new FormModel {
 						name: "menuItemDebuggar"
 						"text": "Debuggar"
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "menuItemDebuggarActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "menuItemStepByStep"
+						"text": "Step by Step"
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
