@@ -60,44 +60,35 @@ public class Lexico {
             else if(Character.isDigit(characterArrayList.get(controle)))
             {
                 t = trataDigito(characterArrayList);
-                System.out.println("Inserindo no Array -> "+t.getSimbolo()+" "+t.getLexema());
             }
             else if(Character.isLetter(characterArrayList.get(controle))) {
-                System.out.println("Controle antes >>> " + controle);
                 t = trataIdentificadorEPalavraReservada(characterArrayList);
-                System.out.println("Controle depois >>> " + controle);
-                System.out.println("Inserindo no Array -> "+t.getSimbolo()+" "+t.getLexema());
             }
             else if(characterArrayList.get(controle).toString().equals(":")) {
                 t = trataAtribuicao(characterArrayList);
-                System.out.println("Inserindo no Array -> "+t.getSimbolo()+" "+t.getLexema());
             }
             else if (characterArrayList.get(controle).toString().equals("+") ||
                     characterArrayList.get(controle).toString().equals("-") ||
                     characterArrayList.get(controle).toString().equals("*")) {
                 t = trataOperadorAritmetico(characterArrayList);
-                System.out.println("Inserindo no Array -> "+t.getSimbolo()+" "+t.getLexema());
             }
             else if (characterArrayList.get(controle).toString().equals("<") ||
                     characterArrayList.get(controle).toString().equals(">") ||
                     characterArrayList.get(controle).toString().equals("=") ||
                     characterArrayList.get(controle).toString().equals("!")) {
                 t = trataOperadorRelacional(characterArrayList);
-                System.out.println("Inserindo no Array -> "+t.getSimbolo()+" "+t.getLexema());
             }
             else if(characterArrayList.get(controle).toString().equals(";") ||
                     characterArrayList.get(controle).toString().equals(",") ||
                     characterArrayList.get(controle).toString().equals("(") ||
                     characterArrayList.get(controle).toString().equals(")") ||
                     characterArrayList.get(controle).toString().equals(".")) {
-                System.out.println("Vamos tratar PONTUACAO com >>> " + characterArrayList.get(controle).toString());
                 t = trataPontuacao(characterArrayList);
-                System.out.println("Inserindo no Array -> "+t.getSimbolo()+" "+t.getLexema());
+            } else {
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), controle + 1);
             }
-            //break;
-            //controle++;
             if (t != null) {
-                System.out.println("Inserindo");
+                System.out.println("Inserindo o Token: " + t.toString());
                 listaToken.add(t);
             } else {
                 controle++;
@@ -178,7 +169,7 @@ public class Lexico {
         return t;
     }
 
-    private Token trataOperadorRelacional(ArrayList<Character> characterArrayList) throws Exception {
+    private Token trataOperadorRelacional(ArrayList<Character> characterArrayList) throws LexicoException {
         Token t = new Token();
         StringBuilder id = new StringBuilder();
 
@@ -252,7 +243,8 @@ public class Lexico {
             else
             {
                 controle--;
-                throw new Exception("Caracter invalido: "+characterArrayList.get(controle)+". Linha: "+ linha);            }
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), controle + 1);
+            }
         }
         return t;
     }
