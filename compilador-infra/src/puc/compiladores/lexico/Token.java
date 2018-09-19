@@ -42,6 +42,7 @@ public class Token {
         return "Token{" +
                 "simbolo='" + simbolo + '\'' +
                 ", lexema='" + lexema + '\'' +
+                ", linha=" + linha +
                 '}';
     }
 }

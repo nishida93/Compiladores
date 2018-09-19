@@ -48,7 +48,8 @@ public class Lexico {
                 linha++;
             }
 
-            else if(characterArrayList.get(controle).toString().equals("{"))
+            else if(characterArrayList.get(controle).toString().equals("{") ||
+                    characterArrayList.get(controle).toString().equals("}"))
             {
                 while(!characterArrayList.get(controle).toString().equals("}"))
                 {
@@ -85,7 +86,7 @@ public class Lexico {
                     characterArrayList.get(controle).toString().equals(".")) {
                 t = trataPontuacao(characterArrayList);
             } else {
-                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), controle + 1);
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha);
             }
             if (t != null) {
                 System.out.println("Inserindo o Token: " + t.toString());
@@ -127,6 +128,7 @@ public class Lexico {
         StringBuilder pontuacao = new StringBuilder();
 
         String str;
+        t.setLinha(linha);
 
         pontuacao.append(characterArrayList.get(controle));
 
@@ -172,6 +174,7 @@ public class Lexico {
     private Token trataOperadorRelacional(ArrayList<Character> characterArrayList) throws LexicoException {
         Token t = new Token();
         StringBuilder id = new StringBuilder();
+        t.setLinha(linha);
 
         String str;
 
@@ -238,12 +241,13 @@ public class Lexico {
                 str = id.toString();
                 t.setSimbolo("sdif");
                 t.setLexema(str);
+                t.setLinha(linha);
                 controle++;
             }
             else
             {
                 controle--;
-                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), controle + 1);
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha);
             }
         }
         return t;
@@ -261,9 +265,11 @@ public class Lexico {
             controle++;
         }
 
-        String str = num.toString();
+        t.setLexema(num.toString());
+        t.setSimbolo(Simbolo.SNUMERO.getName());
+        t.setLinha(linha);
 
-        return new Token(str, Simbolo.SNUMERO.getName());
+        return t;
     }
 
     private Token trataIdentificadorEPalavraReservada(ArrayList<Character> characterArrayList) {
@@ -353,6 +359,7 @@ public class Lexico {
                 t.setSimbolo(Simbolo.SIDENTIFICADOR.getName());
                 break;
         }
+        t.setLinha(linha);
         return t;
     }
 
@@ -364,6 +371,7 @@ public class Lexico {
 
         palavra.append(characterArrayList.get(controle));
         controle++; // le o próximo caracter
+        t.setLinha(linha);
 
         if(characterArrayList.get(controle).toString().equals("="))
         {
@@ -390,6 +398,7 @@ public class Lexico {
         StringBuilder operador = new StringBuilder();
 
         String str;
+        t.setLinha(linha);
 
         operador.append(characterArrayList.get(controle));
 
