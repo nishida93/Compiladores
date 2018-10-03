@@ -6,34 +6,55 @@ new FormModel {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
 			"minimumSize": new java.awt.Dimension( 799, 400 )
-			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "textFieldInput"
-				"preferredSize": new java.awt.Dimension( 106, 400 )
-				"background": new java.awt.Color( 255, 255, 255, 255 )
-				"maximumSize": new java.awt.Dimension( 500, 2147483647 )
-				"horizontalAlignment": 2
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+				name: "panelTudo"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					name: "panelCodigo"
+					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+						name: "scrollPaneCodigo"
+						add( new FormComponent( "javax.swing.JTextArea" ) {
+							name: "textAreaCodigo"
+							"preferredSize": new java.awt.Dimension( 500, 300 )
+						} )
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "Center"
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "North"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					name: "panelErro"
+					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+						name: "scrollPaneErro"
+						add( new FormComponent( "javax.swing.JTextArea" ) {
+							name: "textAreaErro"
+							"preferredSize": new java.awt.Dimension( 500, 100 )
+							"editable": false
+						} )
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "Center"
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "Center"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					name: "panelExecutar"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "buttonExecutar"
+						"text": "COMPILAR"
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "Center"
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "South"
+				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "North"
-			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
-				name: "buttonExecutar"
-				"text": "Executar"
-				"preferredSize": new java.awt.Dimension( 9, 20 )
-				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "buttonExecutarActionPerformed", true ) )
-			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "South"
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label1"
-				"preferredSize": new java.awt.Dimension( 650, 10 )
-				"background": new java.awt.Color( 255, 255, 255, 255 )
-			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "West"
+				"value": "Center"
 			} )
 			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
-				name: "menuBar1"
+				name: "menuBar"
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-					name: "menu1"
+					name: "menuArquivo"
 					"text": "Arquivo"
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
 						name: "menuItemAbrir"
@@ -47,7 +68,7 @@ new FormModel {
 			}
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 820, 590 )
+			"size": new java.awt.Dimension( 850, 615 )
 		} )
 	}
 }
