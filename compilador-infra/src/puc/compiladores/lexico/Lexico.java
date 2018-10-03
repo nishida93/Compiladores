@@ -11,10 +11,9 @@ public class Lexico {
     private int controle = 0;
     private int linha = 1;
     Token t = new Token();
-    private char[] test;
 
     public Lexico() throws Exception {
-        FileInputStream entrada = new FileInputStream(new File("/home/matheus/Desktop/teste1.txt"));
+        FileInputStream entrada = new FileInputStream(new File("/Users/mnishida/Downloads/lexico.txt"));
         InputStreamReader entradaf = new InputStreamReader(entrada);
         int c = entradaf.read();
         ArrayList<Character> characterArrayList = new ArrayList<>();
@@ -25,14 +24,6 @@ public class Lexico {
 
             c = entradaf.read();
         }
-
-
-        /*for (Character test :
-                characterArrayList) {
-            System.out.println(test + "\n");
-
-        }
-        System.out.println("SIZE IS >>> "+characterArrayList.size());*/
 
         while (controle < characterArrayList.size()) {
             t = null;
@@ -56,7 +47,7 @@ public class Lexico {
 
                     controle++;
                 }
-                System.out.println("Fechou o meninao");
+                System.out.println("Fechou o comentario");
             }
             else if(Character.isDigit(characterArrayList.get(controle)))
             {
@@ -97,30 +88,24 @@ public class Lexico {
             }
         }
 
-        for (Token t :
+        /*for (Token t :
                 listaToken) {
             System.out.println(t.toString());
+        }*/
+    }
+
+    public boolean isTokenValid(int index) {
+        try {
+            listaToken.get(index);
+            return true;
+        } catch (IndexOutOfBoundsException ex) {
+            System.out.println("Index é invalido, portanto nao ha mais tokens");
+            return false;
         }
-        /*
-        String content = new String(Files.readAllBytes(Paths.get("/home/matheus/Desktop/teste1.txt")));
-        System.out.println("CONTEUDO >>> "+content);
+    }
 
-        test = content.toCharArray();
-
-        // Para cada caracter no arquivo
-        for (Character out : test) {
-            System.out.println(out+"\n");
-            //listaToken.add(new Token("asasa",Simbolo.SATRIBUICAO.getName()));
-            if (Character.isDigit(out)) {
-                trataDigito();
-            }
-            if (out == '\n') {
-                System.out.println("Quebrou linha");
-                linha++;
-            }
-        }
-
-        System.out.println("O arquivo de entrada tem " + linha + " linhas.");*/
+    public Token getToken(int index) {
+        return listaToken.get(index);
     }
 
     private Token trataPontuacao(ArrayList<Character> characterArrayList) {

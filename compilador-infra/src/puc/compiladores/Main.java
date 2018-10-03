@@ -1,14 +1,15 @@
 package puc.compiladores;
 
 import puc.compiladores.lexico.Lexico;
+import puc.compiladores.sintatico.Sintatico;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            new Lexico();
+            new Sintatico();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Erro na inicializacao: " + e);
         }
     }
 }
