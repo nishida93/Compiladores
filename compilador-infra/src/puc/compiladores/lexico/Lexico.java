@@ -13,8 +13,8 @@ public class Lexico {
     Token t = new Token();
     private char[] test;
 
-    public Lexico() throws Exception {
-        FileInputStream entrada = new FileInputStream(new File("/home/matheus/Desktop/teste1.txt"));
+    public Lexico(File file) throws Exception {
+        FileInputStream entrada = new FileInputStream(file.getPath());
         InputStreamReader entradaf = new InputStreamReader(entrada);
         int c = entradaf.read();
         ArrayList<Character> characterArrayList = new ArrayList<>();

@@ -4,6 +4,8 @@
 
 package puc.compiladores.ui;
 
+import puc.compiladores.lexico.Lexico;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedWriter;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 /**
  * @author Matheus Nishida
@@ -24,7 +27,9 @@ import javax.swing.*;
 public class Compilador extends JFrame {
 
     private ArrayList<String> listArquivo;
+    private boolean flagFile = false;
     private File diretorio;
+    private Lexico lexico;
 
     public Compilador() {
         initComponents();
@@ -45,18 +50,45 @@ public class Compilador extends JFrame {
             try (Stream<String> stream = Files.lines(Paths.get(selectedFile.getAbsolutePath()))) {
                 listArquivo = (ArrayList<String>) stream.collect(Collectors.toList());
                 diretorio = new File(selectedFile.getAbsolutePath());
+                flagFile = true;
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-        new Arquivo(textAreaCodigo, listArquivo);
+        new Arquivo(textAreaCodigo, listArquivo, diretorio);
     }
 
     private void salvarArquivo() {
 
-        try(BufferedWriter writer = Files.newBufferedWriter(diretorio.toPath())) {
-            writer.write(textAreaCodigo.getText());
-        } catch (IOException e) {
+        if(flagFile) {
+            try(BufferedWriter writer = Files.newBufferedWriter(diretorio.toPath())) {
+                for(String line : textAreaCodigo.getText().split("\\n")) {
+                    writer.write(line + "\r\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                diretorio = file;
+                try(BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
+                    for(String line : textAreaCodigo.getText().split("\\n")) {
+                        writer.write(line + "\r\n");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    private void compilarArquivo() {
+        try {
+            lexico = new Lexico(diretorio);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -124,7 +156,7 @@ public class Compilador extends JFrame {
                 {
 
                     //---- textAreaCodigo ----
-                    textAreaCodigo.setPreferredSize(new Dimension(500, 300));
+                    textAreaCodigo.setPreferredSize(new Dimension(400, 300));
                     scrollPaneCodigo.setViewportView(textAreaCodigo);
                 }
                 panelCodigo.add(scrollPaneCodigo, BorderLayout.CENTER);
@@ -153,6 +185,7 @@ public class Compilador extends JFrame {
 
                 //---- buttonExecutar ----
                 buttonExecutar.setText("COMPILAR");
+                buttonExecutar.addActionListener(e -> compilarArquivo());
                 panelExecutar.add(buttonExecutar, BorderLayout.CENTER);
             }
             panelTudo.add(panelExecutar, BorderLayout.SOUTH);
