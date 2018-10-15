@@ -53,7 +53,7 @@ public class Sintatico {
 	private void analisaBloco() throws SintaticoException {
 		tk = sintaticoBuscaToken();
 		analisaEtVariaveis();
-		// analisaSubRotinas();
+		analisaSubRotinas();
 		analisaComandos();
 	}
 
@@ -195,7 +195,7 @@ public class Sintatico {
 
 	private void analisaEnquanto() throws SintaticoException {
 		tk = sintaticoBuscaToken();
-		//analisaExpressao();
+		analisaExpressao();
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
@@ -206,7 +206,7 @@ public class Sintatico {
 
 	private void analisaSe() throws SintaticoException {
 		tk = sintaticoBuscaToken();
-		//analisaExpressao();
+		analisaExpressao();
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
@@ -217,5 +217,51 @@ public class Sintatico {
 		} else {
 			throw SintaticoException.erroSintatico("[ANALISA SE] Faltou a palavra 'entao'", tk.getLinha());
 		}
+	}
+
+	private void analisaSubRotinas() throws SintaticoException {
+		// int flag = 0;
+		if (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SFUNCAO.getName())) {
+			// implementacao do semantico
+		}
+		while (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SFUNCAO.getName())) {
+			if (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName())) {
+				analisaDeclaracaoProcedimento();
+			} else {
+				analisaDeclaracaoFuncao();
+			}
+
+			if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
+				tk = sintaticoBuscaToken();
+			} else {
+				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha());
+			}
+		}
+	}
+
+	private void analisaDeclaracaoProcedimento() throws SintaticoException {
+
+	}
+
+	private void analisaDeclaracaoFuncao() throws SintaticoException {
+
+	}
+
+	private void analisaExpressao() throws SintaticoException {
+
+	}
+
+	private void analisaExpressaoSimples() throws SintaticoException {
+
+	}
+
+	private void analisaTermo() throws SintaticoException {
+
+	}
+
+	private void analisaFator() throws SintaticoException {
+
 	}
 }
