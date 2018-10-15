@@ -13,6 +13,7 @@ public class Sintatico {
 	public Sintatico() throws Exception {
 
 		lx = new Lexico();
+		Thread.sleep(5000);
 		controle = 0;
 
 		while (lx.isTokenValid(controle)) {
@@ -110,6 +111,7 @@ public class Sintatico {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
 			while (!tk.getSimbolo().equals(Simbolo.SFIM.getName())) {
+				System.out.println(tk.toString());
 				if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 					tk = sintaticoBuscaToken();
 					if (!tk.getSimbolo().equals(Simbolo.SFIM.getName())) {
@@ -149,9 +151,9 @@ public class Sintatico {
 	private void analisaAtribChProcedimento() {
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SATRIBUICAO.getName())) {
-			//analisaAtribuicao
+			analisaAtribuicao();
 		} else {
-			//analisaChamadaProcedimento
+			analisaChamadaProcedimento();
 		}
 	}
 
@@ -242,26 +244,112 @@ public class Sintatico {
 	}
 
 	private void analisaDeclaracaoProcedimento() throws SintaticoException {
-
+			tk = sintaticoBuscaToken();
+		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
+			tk = sintaticoBuscaToken();
+			if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
+				analisaBloco();
+			} else {
+				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha());
+			}
+		} else {
+			throw SintaticoException.erroSintatico("Faltou declarar nome do procedimento", tk.getLinha());
+		}
 	}
 
 	private void analisaDeclaracaoFuncao() throws SintaticoException {
-
+		tk = sintaticoBuscaToken();
+		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
+			tk = sintaticoBuscaToken();
+			if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
+				tk = sintaticoBuscaToken();
+				if (tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
+					tk = sintaticoBuscaToken();
+					if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
+						analisaBloco();
+					}
+				} else {
+					throw SintaticoException.erroSintatico("Faltou declarar tipo da funcao", tk.getLinha());
+				}
+			} else {
+				throw SintaticoException.erroSintatico("Faltou caracter ':'", tk.getLinha());
+			}
+		} else {
+			throw SintaticoException.erroSintatico("Fatlou declarar nome da funcao", tk.getLinha());
+		}
 	}
 
 	private void analisaExpressao() throws SintaticoException {
+		analisaExpressaoSimples();
+		if (tk.getSimbolo().equals(Simbolo.SMAIOR.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SMAIORIG.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SMENOR.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SMENORIG.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SDIF.getName())) {
+			tk = sintaticoBuscaToken();
+			analisaExpressaoSimples();
+		}
 
 	}
 
 	private void analisaExpressaoSimples() throws SintaticoException {
-
+		if (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SMENOS.getName())) {
+			tk = sintaticoBuscaToken();
+			analisaTermo();
+			while (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
+					tk.getSimbolo().equals(Simbolo.SMENOS.getName()) ||
+					tk.getSimbolo().equals(Simbolo.SOU.getName())) {
+				tk = sintaticoBuscaToken();
+				analisaTermo();
+			}
+		}
 	}
 
 	private void analisaTermo() throws SintaticoException {
-
+		analisaFator();
+		while (tk.getSimbolo().equals(Simbolo.SMULT.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SDIV.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SE.getName())) {
+			tk = sintaticoBuscaToken();
+			analisaFator();
+		}
 	}
 
 	private void analisaFator() throws SintaticoException {
+		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
+			//analisaChamadaFuncao();
+		} else if (tk.getSimbolo().equals(Simbolo.SNUMERO.getName())) {
+			tk = sintaticoBuscaToken();
+		} else if (tk.getSimbolo().equals(Simbolo.SNAO.getName())) {
+			tk = sintaticoBuscaToken();
+			analisaFator();
+		} else if (tk.getSimbolo().equals(Simbolo.SABREPARENTESES.getName())) {
+			tk = sintaticoBuscaToken();
+			analisaExpressao();
+			if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
+				tk = sintaticoBuscaToken();
+			} else {
+				throw SintaticoException.erroSintatico("Faltou fechar parenteses", tk.getLinha());
+			}
+		} else if (tk.getLexema().equals("verdadeiro") ||
+				tk.getLexema().equals("falso")) {
+			tk = sintaticoBuscaToken();
+		} else {
+			throw SintaticoException.erroSintatico("Erro ao analisar fator", tk.getLinha());
+		}
+	}
+
+	private void analisaChamadaFuncao() {
+		tk = sintaticoBuscaToken();
+	}
+
+	private void analisaChamadaProcedimento() {
+
+	}
+
+	private void analisaAtribuicao() {
 
 	}
 }
