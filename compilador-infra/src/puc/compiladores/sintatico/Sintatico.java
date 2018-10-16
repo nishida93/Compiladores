@@ -13,7 +13,7 @@ public class Sintatico {
 	public Sintatico() throws Exception {
 
 		lx = new Lexico();
-		Thread.sleep(5000);
+		//Thread.sleep(5000);
 		controle = 0;
 
 		while (lx.isTokenValid(controle)) {
@@ -107,18 +107,18 @@ public class Sintatico {
 	}
 
 	private void analisaComandos() throws SintaticoException {
+
 		if (tk.getSimbolo().equals(Simbolo.SINICIO.getName())) {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
 			while (!tk.getSimbolo().equals(Simbolo.SFIM.getName())) {
-				System.out.println(tk.toString());
 				if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 					tk = sintaticoBuscaToken();
-					if (!tk.getSimbolo().equals(Simbolo.SFIM.getName())) {
+                    if (!tk.getSimbolo().equals(Simbolo.SFIM.getName())) {
 						analisaComandoSimples();
 					}
 				} else {
-					throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha());
+					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha());
 				}
 			}
 			tk = sintaticoBuscaToken();
@@ -128,8 +128,7 @@ public class Sintatico {
 	}
 
 	private void analisaComandoSimples() throws SintaticoException {
-		if (tk.getSimbolo()
-			  .equals(Simbolo.SIDENTIFICADOR.getName())) {
+		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 			analisaAtribChProcedimento();
 		} else if (tk.getSimbolo()
 					 .equals(Simbolo.SSE.getName())) {
@@ -148,7 +147,7 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaAtribChProcedimento() {
+	private void analisaAtribChProcedimento() throws SintaticoException {
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SATRIBUICAO.getName())) {
 			analisaAtribuicao();
@@ -284,6 +283,7 @@ public class Sintatico {
 		analisaExpressaoSimples();
 		if (tk.getSimbolo().equals(Simbolo.SMAIOR.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SMAIORIG.getName()) ||
+                tk.getSimbolo().equals(Simbolo.SIG.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SMENOR.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SMENORIG.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SDIF.getName())) {
@@ -296,15 +296,16 @@ public class Sintatico {
 	private void analisaExpressaoSimples() throws SintaticoException {
 		if (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SMENOS.getName())) {
-			tk = sintaticoBuscaToken();
-			analisaTermo();
-			while (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
-					tk.getSimbolo().equals(Simbolo.SMENOS.getName()) ||
-					tk.getSimbolo().equals(Simbolo.SOU.getName())) {
-				tk = sintaticoBuscaToken();
-				analisaTermo();
-			}
-		}
+            tk = sintaticoBuscaToken();
+        }
+        analisaTermo();
+        while (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
+                tk.getSimbolo().equals(Simbolo.SMENOS.getName()) ||
+                tk.getSimbolo().equals(Simbolo.SOU.getName())) {
+            tk = sintaticoBuscaToken();
+            analisaTermo();
+        }
+
 	}
 
 	private void analisaTermo() throws SintaticoException {
@@ -319,7 +320,7 @@ public class Sintatico {
 
 	private void analisaFator() throws SintaticoException {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-			//analisaChamadaFuncao();
+			analisaChamadaFuncao();
 		} else if (tk.getSimbolo().equals(Simbolo.SNUMERO.getName())) {
 			tk = sintaticoBuscaToken();
 		} else if (tk.getSimbolo().equals(Simbolo.SNAO.getName())) {
@@ -331,13 +332,13 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 				tk = sintaticoBuscaToken();
 			} else {
-				throw SintaticoException.erroSintatico("Faltou fechar parenteses", tk.getLinha());
+				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha());
 			}
 		} else if (tk.getLexema().equals("verdadeiro") ||
 				tk.getLexema().equals("falso")) {
 			tk = sintaticoBuscaToken();
 		} else {
-			throw SintaticoException.erroSintatico("Erro ao analisar fator", tk.getLinha());
+			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha());
 		}
 	}
 
@@ -349,7 +350,9 @@ public class Sintatico {
 
 	}
 
-	private void analisaAtribuicao() {
+	private void analisaAtribuicao() throws SintaticoException {
+        tk = sintaticoBuscaToken();
 
+        analisaExpressao();
 	}
 }
