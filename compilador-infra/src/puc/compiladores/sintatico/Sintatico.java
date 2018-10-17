@@ -5,6 +5,7 @@ import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 
 public class Sintatico {
@@ -31,6 +32,8 @@ public class Sintatico {
 						analisaBloco();
 						if (tk.getSimbolo().equals(Simbolo.SPONTO.getName()) && !lx.isTokenValid(controle)) {
 							System.out.println("SINTATICO EXECUTADO COM SUCESSO");
+							textAreaErro.setText("EXECUTADO COM SUCESSO");
+							textAreaErro.setForeground(Color.GREEN);
 						} else {
 							throw SintaticoException.erroFaltandoPonto(tk.getLinha(), textArea);
 						}

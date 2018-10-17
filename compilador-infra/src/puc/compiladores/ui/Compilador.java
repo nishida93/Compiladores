@@ -39,6 +39,7 @@ public class Compilador extends JFrame {
 
     private void abrirArquivo() {
 
+        textAreaCodigo.setText(null);
         JFileChooser fileChooser = new JFileChooser();
         listArquivo = new ArrayList<>();
         int result = fileChooser.showOpenDialog(this);
