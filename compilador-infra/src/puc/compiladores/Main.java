@@ -1,6 +1,5 @@
 package puc.compiladores;
 
-import puc.compiladores.sintatico.Sintatico;
 import puc.compiladores.ui.Compilador;
 
 public class Main {

@@ -1,11 +1,14 @@
 package puc.compiladores.sintatico;
 
+import java.awt.Color;
+
 import javax.swing.*;
 
 public class SintaticoException extends Exception {
 
 	public SintaticoException(final String s, final JTextArea textAreaErro) {
 		textAreaErro.append(s);
+		textAreaErro.setForeground(Color.RED);
 	}
 
 	public static SintaticoException erroSintatico(final String msg, final int linha, final JTextArea textAreaErro) throws SintaticoException {
