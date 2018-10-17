@@ -1,5 +1,6 @@
 package puc.compiladores.lexico;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -11,9 +12,11 @@ public class Lexico {
     private int controle = 0;
     private int linha = 1;
     Token t = new Token();
+    private JTextArea textArea;
 
-    public Lexico() throws Exception {
-        FileInputStream entrada = new FileInputStream(new File("/Users/mnishida/Downloads/TesteFinal01.txt"));
+    public Lexico(File arquivo, JTextArea textAreaErro) throws Exception {
+        textArea = textAreaErro;
+        FileInputStream entrada = new FileInputStream(arquivo);
         InputStreamReader entradaf = new InputStreamReader(entrada);
         int c = entradaf.read();
         ArrayList<Character> characterArrayList = new ArrayList<>();
@@ -77,7 +80,7 @@ public class Lexico {
                     characterArrayList.get(controle).toString().equals(".")) {
                 t = trataPontuacao(characterArrayList);
             } else {
-                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha);
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textArea);
             }
             if (t != null) {
                 System.out.println("Inserindo o Token: " + t.toString());
@@ -232,7 +235,7 @@ public class Lexico {
             else
             {
                 controle--;
-                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha);
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textArea);
             }
         }
         return t;
