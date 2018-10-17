@@ -12,9 +12,9 @@ new FormModel {
 					name: "panelCodigo"
 					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 						name: "scrollPaneCodigo"
+						"preferredSize": new java.awt.Dimension( 2, 300 )
 						add( new FormComponent( "javax.swing.JTextArea" ) {
 							name: "textAreaCodigo"
-							"preferredSize": new java.awt.Dimension( 500, 300 )
 						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "Center"
@@ -26,9 +26,9 @@ new FormModel {
 					name: "panelErro"
 					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 						name: "scrollPaneErro"
+						"preferredSize": new java.awt.Dimension( 2, 250 )
 						add( new FormComponent( "javax.swing.JTextArea" ) {
 							name: "textAreaErro"
-							"preferredSize": new java.awt.Dimension( 500, 100 )
 							"editable": false
 						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {

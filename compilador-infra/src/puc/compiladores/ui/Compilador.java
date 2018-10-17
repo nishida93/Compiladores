@@ -10,16 +10,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 
 /**
  * @author Matheus Nishida
@@ -86,11 +83,11 @@ public class Compilador extends JFrame {
     }
 
     private void compilarArquivo() {
-        try {
-            lexico = new Lexico(diretorio);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            lexico = new Lexico(diretorio);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void initComponents() {
@@ -154,9 +151,7 @@ public class Compilador extends JFrame {
 
                 //======== scrollPaneCodigo ========
                 {
-
-                    //---- textAreaCodigo ----
-                    textAreaCodigo.setPreferredSize(new Dimension(400, 300));
+                    scrollPaneCodigo.setPreferredSize(new Dimension(2, 300));
                     scrollPaneCodigo.setViewportView(textAreaCodigo);
                 }
                 panelCodigo.add(scrollPaneCodigo, BorderLayout.CENTER);
@@ -169,9 +164,9 @@ public class Compilador extends JFrame {
 
                 //======== scrollPaneErro ========
                 {
+                    scrollPaneErro.setPreferredSize(new Dimension(2, 250));
 
                     //---- textAreaErro ----
-                    textAreaErro.setPreferredSize(new Dimension(500, 100));
                     textAreaErro.setEditable(false);
                     scrollPaneErro.setViewportView(textAreaErro);
                 }
