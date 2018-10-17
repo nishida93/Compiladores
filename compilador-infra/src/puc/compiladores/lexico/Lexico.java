@@ -8,18 +8,21 @@ import java.util.ArrayList;
 
 public class Lexico {
 
-    private static ArrayList<Token> listaToken = new ArrayList();
     private int controle = 0;
     private int linha = 1;
     Token t = new Token();
     private JTextArea textArea;
+    private int qtdTokens;
+
+    private final ArrayList<Character> characterArrayList;
 
     public Lexico(File arquivo, JTextArea textAreaErro) throws Exception {
+        qtdTokens = 0;
         textArea = textAreaErro;
         FileInputStream entrada = new FileInputStream(arquivo);
         InputStreamReader entradaf = new InputStreamReader(entrada);
         int c = entradaf.read();
-        ArrayList<Character> characterArrayList = new ArrayList<>();
+        characterArrayList = new ArrayList<>();
         characterArrayList.clear();
         while(c!=-1)
         {
@@ -28,13 +31,25 @@ public class Lexico {
             c = entradaf.read();
         }
 
+        /*for (Token t :
+                listaToken) {
+            System.out.println(t.toString());
+        }*/
+    }
+
+    public boolean isFileOver(int controleSintatico) {
+        return controleSintatico == qtdTokens;
+    }
+
+    public Token getToken(int index) throws LexicoException {
+        System.out.println("Entrou no Lexico para pegar Token com controle = " + controle);
         while (controle < characterArrayList.size()) {
             t = null;
             System.out.println("Entrou no while com caracter >>> " + characterArrayList.get(controle).toString());
             if (characterArrayList.get(controle).toString().equals(" ") ||
-                characterArrayList.get(controle).toString().equals("") ||
-                characterArrayList.get(controle).toString().equals("\r") ||
-                characterArrayList.get(controle).toString().equals("\t"))
+                    characterArrayList.get(controle).toString().equals("") ||
+                    characterArrayList.get(controle).toString().equals("\r") ||
+                    characterArrayList.get(controle).toString().equals("\t"))
             {}
             else if(characterArrayList.get(controle).toString().equals("\n"))
             {
@@ -51,6 +66,7 @@ public class Lexico {
                     controle++;
                 }
                 System.out.println("Fechou o comentario");
+                controle++;
             }
             else if(Character.isDigit(characterArrayList.get(controle)))
             {
@@ -83,32 +99,14 @@ public class Lexico {
                 throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textArea);
             }
             if (t != null) {
-                System.out.println("Inserindo o Token: " + t.toString());
-                listaToken.add(t);
-            } else {
-                controle++;
-                System.out.println("Skippando pois nao tem token valido");
+                qtdTokens++;
+                System.out.println("Está retornando o Token >>> " + t.toString());
+                return t;
+                //listaToken.add(t);
             }
+            controle++;
         }
-
-        /*for (Token t :
-                listaToken) {
-            System.out.println(t.toString());
-        }*/
-    }
-
-    public boolean isTokenValid(int index) {
-        try {
-            listaToken.get(index);
-            return true;
-        } catch (IndexOutOfBoundsException ex) {
-            System.out.println("Index é invalido, portanto nao ha mais tokens");
-            return false;
-        }
-    }
-
-    public Token getToken(int index) {
-        return listaToken.get(index);
+        return null;
     }
 
     private Token trataPontuacao(ArrayList<Character> characterArrayList) {
