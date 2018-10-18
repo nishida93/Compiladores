@@ -11,14 +11,17 @@ public class Lexico {
     private int controle = 0;
     private int linha = 1;
     Token t = new Token();
-    private JTextArea textArea;
+    private JTextArea textAreaErro;
+    private JTextArea textAreaCodigo;
     private int qtdTokens;
 
     private final ArrayList<Character> characterArrayList;
 
-    public Lexico(File arquivo, JTextArea textAreaErro) throws Exception {
+    public Lexico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         qtdTokens = 0;
-        textArea = textAreaErro;
+        textAreaErro = textAreaError;
+        textAreaCodigo = textAreaCod;
+
         FileInputStream entrada = new FileInputStream(arquivo);
         InputStreamReader entradaf = new InputStreamReader(entrada);
         int c = entradaf.read();
@@ -96,7 +99,7 @@ public class Lexico {
                     characterArrayList.get(controle).toString().equals(".")) {
                 t = trataPontuacao(characterArrayList);
             } else {
-                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textArea);
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textAreaErro, textAreaCodigo);
             }
             if (t != null) {
                 qtdTokens++;
@@ -233,7 +236,7 @@ public class Lexico {
             else
             {
                 controle--;
-                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textArea);
+                throw LexicoException.erroLexico("Caracter invalido " + characterArrayList.get(controle), linha, textAreaErro, textAreaCodigo);
             }
         }
         return t;

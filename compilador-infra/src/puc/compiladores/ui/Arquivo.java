@@ -22,7 +22,7 @@ public class Arquivo {
         for(int i=0 ; i < arquivo.size() ; i++) {
             String linha = getLinha(i);
             instructions.append(linha);
-            if(linha != "\n"){
+            if(linha != "\r\n"){
                 instructions.append("\r\n");
             }
         }

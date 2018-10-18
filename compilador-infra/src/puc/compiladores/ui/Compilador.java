@@ -38,8 +38,8 @@ public class Compilador extends JFrame {
     }
 
     private void abrirArquivo() {
-
         textAreaCodigo.setText(null);
+        textAreaErro.setText(null);
         JFileChooser fileChooser = new JFileChooser();
         listArquivo = new ArrayList<>();
         int result = fileChooser.showOpenDialog(this);
@@ -58,7 +58,7 @@ public class Compilador extends JFrame {
     }
 
     private void salvarArquivo() {
-
+        textAreaErro.setText(null);
         if(flagFile) {
             try(BufferedWriter writer = Files.newBufferedWriter(diretorio.toPath())) {
                 for(String line : textAreaCodigo.getText().split("\\n")) {
@@ -86,7 +86,7 @@ public class Compilador extends JFrame {
 
     private void compilarArquivo() {
         try {
-            new Sintatico(diretorio, textAreaErro);
+            new Sintatico(diretorio, textAreaErro, textAreaCodigo);
         } catch (Exception e) {
             try {
                 throw e;
@@ -99,17 +99,19 @@ public class Compilador extends JFrame {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner Evaluation license - Luan Bonomi
-        menuBar = new JMenuBar();
-        menuArquivo = new JMenu();
+        menuBar1 = new JMenuBar();
+        menu1 = new JMenu();
         menuItemAbrir = new JMenuItem();
         menuItemSalvar = new JMenuItem();
         panelTudo = new JPanel();
         panelCodigo = new JPanel();
         scrollPaneCodigo = new JScrollPane();
         textAreaCodigo = new JTextArea();
+        labelCodigo = new JLabel();
         panelErro = new JPanel();
         scrollPaneErro = new JScrollPane();
         textAreaErro = new JTextArea();
+        labelErro = new JLabel();
         panelExecutar = new JPanel();
         buttonExecutar = new JButton();
 
@@ -118,70 +120,76 @@ public class Compilador extends JFrame {
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        //======== menuBar ========
+        //======== menuBar1 ========
         {
 
-            //======== menuArquivo ========
+            //======== menu1 ========
             {
-                menuArquivo.setText("Arquivo");
+                menu1.setText("Arquivo");
 
                 //---- menuItemAbrir ----
                 menuItemAbrir.setText("Abrir");
                 menuItemAbrir.addActionListener(e -> abrirArquivo());
-                menuArquivo.add(menuItemAbrir);
+                menu1.add(menuItemAbrir);
 
                 //---- menuItemSalvar ----
                 menuItemSalvar.setText("Salvar");
                 menuItemSalvar.addActionListener(e -> salvarArquivo());
-                menuArquivo.add(menuItemSalvar);
+                menu1.add(menuItemSalvar);
             }
-            menuBar.add(menuArquivo);
+            menuBar1.add(menu1);
         }
-        setJMenuBar(menuBar);
+        setJMenuBar(menuBar1);
 
         //======== panelTudo ========
         {
 
             // JFormDesigner evaluation mark
             panelTudo.setBorder(new javax.swing.border.CompoundBorder(
-                    new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0),
-                            "JFormDesigner Evaluation", javax.swing.border.TitledBorder.CENTER,
-                            javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
-                            java.awt.Color.red), panelTudo.getBorder())); panelTudo.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
+                new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0),
+                    "JFormDesigner Evaluation", javax.swing.border.TitledBorder.CENTER,
+                    javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
+                    java.awt.Color.red), panelTudo.getBorder())); panelTudo.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
 
             panelTudo.setLayout(new BorderLayout());
 
             //======== panelCodigo ========
             {
+                panelCodigo.setPreferredSize(new Dimension(0, 300));
                 panelCodigo.setLayout(new BorderLayout());
 
                 //======== scrollPaneCodigo ========
                 {
-                    scrollPaneCodigo.setPreferredSize(new Dimension(2, 300));
                     scrollPaneCodigo.setViewportView(textAreaCodigo);
                 }
                 panelCodigo.add(scrollPaneCodigo, BorderLayout.CENTER);
+
+                //---- labelCodigo ----
+                labelCodigo.setText("C\u00f3digo");
+                panelCodigo.add(labelCodigo, BorderLayout.NORTH);
             }
             panelTudo.add(panelCodigo, BorderLayout.NORTH);
 
             //======== panelErro ========
             {
+                panelErro.setPreferredSize(new Dimension(0, 200));
                 panelErro.setLayout(new BorderLayout());
 
                 //======== scrollPaneErro ========
                 {
-                    scrollPaneErro.setPreferredSize(new Dimension(2, 250));
-
-                    //---- textAreaErro ----
-                    textAreaErro.setEditable(false);
                     scrollPaneErro.setViewportView(textAreaErro);
                 }
                 panelErro.add(scrollPaneErro, BorderLayout.CENTER);
+
+                //---- labelErro ----
+                labelErro.setText("Console");
+                panelErro.add(labelErro, BorderLayout.NORTH);
             }
             panelTudo.add(panelErro, BorderLayout.CENTER);
 
             //======== panelExecutar ========
             {
+                panelExecutar.setPreferredSize(new Dimension(0, 50));
                 panelExecutar.setLayout(new BorderLayout());
 
                 //---- buttonExecutar ----
@@ -199,17 +207,19 @@ public class Compilador extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Luan Bonomi
-    private JMenuBar menuBar;
-    private JMenu menuArquivo;
+    private JMenuBar menuBar1;
+    private JMenu menu1;
     private JMenuItem menuItemAbrir;
     private JMenuItem menuItemSalvar;
     private JPanel panelTudo;
     private JPanel panelCodigo;
     private JScrollPane scrollPaneCodigo;
     private JTextArea textAreaCodigo;
+    private JLabel labelCodigo;
     private JPanel panelErro;
     private JScrollPane scrollPaneErro;
     private JTextArea textAreaErro;
+    private JLabel labelErro;
     private JPanel panelExecutar;
     private JButton buttonExecutar;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

@@ -14,12 +14,14 @@ public class Sintatico {
 	private int controle;
 	private Lexico lx;
 	private Token tk;
-	private JTextArea textArea;
+	private JTextArea textAreaErro;
+	private JTextArea textAreaCodigo;
 
-	public Sintatico(File arquivo, JTextArea textAreaErro) throws Exception {
-		textAreaErro.setText("");
-	    textArea = textAreaErro;
-		lx = new Lexico(arquivo, textArea);
+	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
+		textAreaError.setText("");
+	    textAreaErro = textAreaError;
+	    textAreaCodigo = textAreaCod;
+		lx = new Lexico(arquivo, textAreaErro, textAreaCodigo);
 		//Thread.sleep(5000);
 		controle = 0;
 
@@ -36,16 +38,16 @@ public class Sintatico {
 							textAreaErro.setText("EXECUTADO COM SUCESSO");
 							textAreaErro.setForeground(Color.GREEN);
 						} else {
-							throw SintaticoException.erroFaltandoPonto(tk.getLinha(), textArea);
+							throw SintaticoException.erroFaltandoPonto(tk.getLinha(), textAreaErro, textAreaCodigo);
 						}
 					} else {
-						throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textArea);
+						throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
 					}
 				} else {
-					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			} else {
-				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		}
 	}
@@ -76,11 +78,11 @@ public class Sintatico {
 					if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 						tk = sintaticoBuscaToken();
 					} else {
-						throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textArea);
+						throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
 					}
 				}
 			} else {
-				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		}
 	}
@@ -93,14 +95,14 @@ public class Sintatico {
 					if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName())) {
 						tk = sintaticoBuscaToken();
 						if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
-							throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+							throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 						}
 					}
 				} else {
-					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			} else {
-				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		}
 		tk = sintaticoBuscaToken();
@@ -109,7 +111,7 @@ public class Sintatico {
 
 	private void analisaTipo() throws SintaticoException, LexicoException {
 		if (!tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) && !tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
-			throw SintaticoException.erroSintatico("Tipo de variavel invalido", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("Tipo de variavel invalido", tk.getLinha(), textAreaErro, textAreaCodigo);
 		} else {
 			tk = sintaticoBuscaToken();
 		}
@@ -127,12 +129,12 @@ public class Sintatico {
 						analisaComandoSimples();
 					}
 				} else {
-					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			}
 			tk = sintaticoBuscaToken();
 		} else {
-			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -174,13 +176,13 @@ public class Sintatico {
 				if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 					tk = sintaticoBuscaToken();
 				} else {
-					throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou fechar parenteses", tk.getLinha(), textArea);
+					throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			} else {
-				throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou passar identificador como parametro", tk.getLinha(), textArea);
+				throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou passar identificador como parametro", tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		} else {
-			throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou abrir parenteses", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou abrir parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -193,13 +195,13 @@ public class Sintatico {
 				if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 					tk = sintaticoBuscaToken();
 				} else {
-					throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou fechar parenteses", tk.getLinha(), textArea);
+					throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			} else {
-				throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou passar identificador como parametro", tk.getLinha(), textArea);
+				throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou passar identificador como parametro", tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		} else {
-			throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou abrir parenteses", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou abrir parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -210,7 +212,7 @@ public class Sintatico {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
 		} else {
-			throw SintaticoException.erroSintatico("[ANALISA ENQUANTO] Faltou a palavra 'faca'", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("[ANALISA ENQUANTO] Faltou a palavra 'faca'", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -225,7 +227,7 @@ public class Sintatico {
 				analisaComandoSimples();
 			}
 		} else {
-			throw SintaticoException.erroSintatico("[ANALISA SE] Faltou a palavra 'entao'", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("[ANALISA SE] Faltou a palavra 'entao'", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -246,7 +248,7 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 				tk = sintaticoBuscaToken();
 			} else {
-				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textArea);
+				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		}
 	}
@@ -258,10 +260,10 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 				analisaBloco();
 			} else {
-				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textArea);
+				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		} else {
-			throw SintaticoException.erroSintatico("Faltou declarar nome do procedimento", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("Faltou declarar nome do procedimento", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -278,13 +280,13 @@ public class Sintatico {
 						analisaBloco();
 					}
 				} else {
-					throw SintaticoException.erroSintatico("Faltou declarar tipo da funcao", tk.getLinha(), textArea);
+					throw SintaticoException.erroSintatico("Faltou declarar tipo da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			} else {
-				throw SintaticoException.erroSintatico("Faltou caracter ':'", tk.getLinha(), textArea);
+				throw SintaticoException.erroSintatico("Faltou caracter ':'", tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		} else {
-			throw SintaticoException.erroSintatico("Fatlou declarar nome da funcao", tk.getLinha(), textArea);
+			throw SintaticoException.erroSintatico("Fatlou declarar nome da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
@@ -341,13 +343,13 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 				tk = sintaticoBuscaToken();
 			} else {
-				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		} else if (tk.getLexema().equals("verdadeiro") ||
 				tk.getLexema().equals("falso")) {
 			tk = sintaticoBuscaToken();
 		} else {
-			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textArea);
+			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
