@@ -9,9 +9,7 @@ import puc.compiladores.sintatico.Sintatico;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -40,49 +38,74 @@ public class Compilador extends JFrame {
     private void abrirArquivo() {
         textAreaCodigo.setText(null);
         textAreaErro.setText(null);
-        JFileChooser fileChooser = new JFileChooser();
-        listArquivo = new ArrayList<>();
-        int result = fileChooser.showOpenDialog(this);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            try (Stream<String> stream = Files.lines(Paths.get(selectedFile.getAbsolutePath()))) {
-                listArquivo = (ArrayList<String>) stream.collect(Collectors.toList());
-                diretorio = new File(selectedFile.getAbsolutePath());
-                flagFile = true;
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        new Arquivo(textAreaCodigo, listArquivo, diretorio);
+        FileDialog fd = new FileDialog(this, "Open", FileDialog.LOAD);
+        fd.setVisible(true);
+        String path = fd.getDirectory();
+        String nameFile = fd.getFile();
+        diretorio = new File(path + nameFile);
+        flagFile = true;
+        printandoTexto();
+        //new Arquivo(textAreaCodigo, listArquivo, diretorio);
     }
 
     private void salvarArquivo() {
         textAreaErro.setText(null);
         if(flagFile) {
-            try(BufferedWriter writer = Files.newBufferedWriter(diretorio.toPath())) {
-                for(String line : textAreaCodigo.getText().split("\\n")) {
-                    writer.write(line + "\r\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            escrevendoTexto();
+//            try(BufferedWriter writer = Files.newBufferedWriter(diretorio.toPath())) {
+//                for(String line : textAreaCodigo.getText().split("\\n")) {
+//                    writer.write(line + "\r\n");
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         } else {
             JFileChooser fileChooser = new JFileChooser();
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 diretorio = file;
-                try(BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
-                    for(String line : textAreaCodigo.getText().split("\\n")) {
-                        writer.write(line + "\r\n");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                escrevendoTexto();
+//                try(BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
+////                    for(String line : textAreaCodigo.getText().split("\\n")) {
+////                        writer.write(line + "\r\n");
+////                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
 
+        printandoTexto();
+
     }
+
+    private void escrevendoTexto(){
+        try {
+            FileWriter writer = new FileWriter(diretorio);
+            BufferedWriter bw = new BufferedWriter(writer);
+            textAreaCodigo.write(bw);
+            bw.close();
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    private void printandoTexto() {
+        textAreaCodigo.setText(null);
+
+        try {
+            FileReader reader = new FileReader(diretorio);
+            BufferedReader br = new BufferedReader(reader);
+            textAreaCodigo.read(br, null);
+            br.close();
+            textAreaCodigo.requestFocus();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 
     private void compilarArquivo() {
         try {
