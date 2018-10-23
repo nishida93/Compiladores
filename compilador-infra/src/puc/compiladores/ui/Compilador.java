@@ -46,33 +46,18 @@ public class Compilador extends JFrame {
         diretorio = new File(path + nameFile);
         flagFile = true;
         printandoTexto();
-        //new Arquivo(textAreaCodigo, listArquivo, diretorio);
     }
 
     private void salvarArquivo() {
         textAreaErro.setText(null);
         if(flagFile) {
             escrevendoTexto();
-//            try(BufferedWriter writer = Files.newBufferedWriter(diretorio.toPath())) {
-//                for(String line : textAreaCodigo.getText().split("\\n")) {
-//                    writer.write(line + "\r\n");
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
         } else {
             JFileChooser fileChooser = new JFileChooser();
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 diretorio = file;
                 escrevendoTexto();
-//                try(BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
-////                    for(String line : textAreaCodigo.getText().split("\\n")) {
-////                        writer.write(line + "\r\n");
-////                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
             }
         }
 
