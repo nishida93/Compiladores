@@ -68,6 +68,9 @@ public class Lexico {
 
                     controle++;
                 }
+                if (characterArrayList.get(controle+1).toString().equals("}")) {
+                    throw LexicoException.erroLexico("Erro em comentarios", linha, textAreaErro, textAreaCodigo);
+                }
                 System.out.println("Fechou o comentario");
                 controle++;
             }
