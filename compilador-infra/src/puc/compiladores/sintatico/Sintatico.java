@@ -14,6 +14,7 @@ public class Sintatico {
 	private int controle;
 	private Lexico lx;
 	private Token tk;
+	private Token previousTk;
 	private JTextArea textAreaErro;
 	private JTextArea textAreaCodigo;
 
@@ -25,7 +26,7 @@ public class Sintatico {
 		//Thread.sleep(5000);
 		controle = 0;
 
-		while (lx.isFileOver(controle)) {
+		while (!lx.isFileOver(controle)) {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SPROGRAMA.getName())) {
 				tk = sintaticoBuscaToken();
@@ -33,12 +34,16 @@ public class Sintatico {
 					tk = sintaticoBuscaToken();
 					if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 						analisaBloco();
-						if (tk.getSimbolo().equals(Simbolo.SPONTO.getName()) && lx.isFileOver(controle)) {
+						if (tk == null) {
+							throw SintaticoException.erroFaltandoPonto(previousTk.getLinha(), textAreaErro, textAreaCodigo);
+						}
+						tk = sintaticoBuscaToken();
+						if (previousTk.getSimbolo().equals(Simbolo.SPONTO.getName()) && tk == null) {
 							System.out.println("SINTATICO EXECUTADO COM SUCESSO");
 							textAreaErro.setText("EXECUTADO COM SUCESSO");
 							textAreaErro.setForeground(Color.GREEN);
 						} else {
-							throw SintaticoException.erroFaltandoPonto(tk.getLinha(), textAreaErro, textAreaCodigo);
+							throw SintaticoException.erroSintatico("Caracter invalido " + tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 						}
 					} else {
 						throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -53,7 +58,8 @@ public class Sintatico {
 	}
 
 	private Token sintaticoBuscaToken() throws LexicoException {
-		Token t = lx.getToken(controle);
+		previousTk = tk;
+		Token t = lx.getToken();
 		incrementaControle();
 		return t;
 	}

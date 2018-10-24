@@ -41,10 +41,10 @@ public class Lexico {
     }
 
     public boolean isFileOver(int controleSintatico) {
-        return controleSintatico == qtdTokens;
+        return controle == characterArrayList.size();
     }
 
-    public Token getToken(int index) throws LexicoException {
+    public Token getToken() throws LexicoException {
         System.out.println("Entrou no Lexico para pegar Token com controle = " + controle);
         while (controle < characterArrayList.size()) {
             t = null;
