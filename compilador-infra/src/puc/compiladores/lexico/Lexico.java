@@ -68,9 +68,14 @@ public class Lexico {
 
                     controle++;
                 }
-                if (characterArrayList.get(controle+1).toString().equals("}")) {
-                    throw LexicoException.erroLexico("Erro em comentarios", linha, textAreaErro, textAreaCodigo);
+                try {
+                    if (characterArrayList.get(controle+1).toString().equals("}")) {
+                        throw LexicoException.erroLexico("Erro em comentarios", linha, textAreaErro, textAreaCodigo);
+                    }
+                } catch (IndexOutOfBoundsException e) {
+
                 }
+
                 System.out.println("Fechou o comentario");
                 controle++;
             }
