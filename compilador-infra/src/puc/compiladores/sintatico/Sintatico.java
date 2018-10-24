@@ -4,6 +4,8 @@ import puc.compiladores.lexico.Lexico;
 import puc.compiladores.lexico.LexicoException;
 import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
+import puc.compiladores.semantico.Semantico;
+import puc.compiladores.semantico.SimboloPrograma;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +15,7 @@ public class Sintatico {
 
 	private int controle;
 	private Lexico lx;
+	private Semantico semantico;
 	private Token tk;
 	private Token previousTk;
 	private JTextArea textAreaErro;
@@ -23,6 +26,7 @@ public class Sintatico {
 	    textAreaErro = textAreaError;
 	    textAreaCodigo = textAreaCod;
 		lx = new Lexico(arquivo, textAreaErro, textAreaCodigo);
+		semantico = new Semantico();
 		//Thread.sleep(5000);
 		controle = 0;
 
@@ -31,6 +35,7 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SPROGRAMA.getName())) {
 				tk = sintaticoBuscaToken();
 				if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
+				    semantico.insereTabelaSimbolos(new SimboloPrograma(tk.getLexema(),"",""));
 					tk = sintaticoBuscaToken();
 					if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 						analisaBloco();
@@ -39,6 +44,16 @@ public class Sintatico {
 						}
 						tk = sintaticoBuscaToken();
 						if (previousTk.getSimbolo().equals(Simbolo.SPONTO.getName()) && tk == null) {
+                            System.out.println(semantico.pesquisaDuplicidadeVariavel("a"));
+                            System.out.println(semantico.pesquisaDuplicidadeVariavel("b"));
+                            System.out.println(semantico.pesquisaDuplicidadeVariavel("x"));
+                            System.out.println(semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos("analisa1"));
+                            System.out.println(semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos("analisa4"));
+                            System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("analisa1"));
+                            System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("func"));
+
+
+                            semantico.imprime();
 							System.out.println("SINTATICO EXECUTADO COM SUCESSO");
 							textAreaErro.setText("EXECUTADO COM SUCESSO");
 							textAreaErro.setForeground(Color.GREEN);
