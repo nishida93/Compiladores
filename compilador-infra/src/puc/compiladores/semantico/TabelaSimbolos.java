@@ -8,8 +8,6 @@ public class TabelaSimbolos {
 
     public TabelaSimbolos() {
         pilha = new ArrayList<>();
-
-        //pilha.add(new SimboloPrograma());
     }
 
     public void add(Simbolo o) {
@@ -23,14 +21,12 @@ public class TabelaSimbolos {
                 return true;
             }
         }
-
         return false;
     }
 
     public void imprime() {
         for (Simbolo valor:
              pilha) {
-
             if (valor instanceof SimboloPrograma) {
                 System.out.println("Simbolo programa");
             } else if (valor instanceof SimboloProcedimento) {
@@ -65,4 +61,13 @@ public class TabelaSimbolos {
 
         return false;
     }
+
+	public void colocaTipo(final String lexema, final String tipo) {
+		for (Simbolo simbolo :
+				pilha) {
+			if (simbolo.getLexema().equals(lexema) && simbolo instanceof SimboloVariavel) {
+				((SimboloVariavel) simbolo).setTipoVariavel(tipo);
+			}
+		}
+	}
 }

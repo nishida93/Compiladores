@@ -70,6 +70,10 @@ public class Semantico {
         tabelaSimbolos.add(new SimboloProcedimento("analisa1", "",""));*/
     }
 
+    /**
+     * TODO: apagar o método, uma vez que é apenas para debug
+     * Imprime toda a tabela de simbolos
+     */
     public void imprime() {
         tabelaSimbolos.imprime();
     }
@@ -78,9 +82,10 @@ public class Semantico {
      * Coloca tipo na tabela de simbolos
      *
      * @param lexema
+     * @param tipo
      */
-    public void colocaTipoTabela(final String lexema) {
-
+    public void colocaTipoTabela(final String lexema, final String tipo) {
+        tabelaSimbolos.colocaTipo(lexema, tipo);
     }
 
 }
