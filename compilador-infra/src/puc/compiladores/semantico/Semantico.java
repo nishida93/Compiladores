@@ -59,15 +59,6 @@ public class Semantico {
      */
     public void insereTabelaSimbolos(Simbolo simbolo) {
         tabelaSimbolos.add(simbolo);
-        /*tabelaSimbolos.add(new SimboloVariavel("x", "sas", "", "booleano"));
-        tabelaSimbolos.add(new SimboloVariavel("y", "sas", "", "inteiro"));
-        tabelaSimbolos.add(new SimboloProcedimento("analisa1","",""));
-        tabelaSimbolos.add(new SimboloProcedimento("analisa2","",""));
-        tabelaSimbolos.add(new SimboloProcedimento("analisa3","",""));
-
-        tabelaSimbolos.add(new SimboloVariavel("z", "sas", "", "inteiro"));
-        tabelaSimbolos.add(new SimboloVariavel("a", "sas", "", "booleano"));
-        tabelaSimbolos.add(new SimboloProcedimento("analisa1", "",""));*/
     }
 
     /**

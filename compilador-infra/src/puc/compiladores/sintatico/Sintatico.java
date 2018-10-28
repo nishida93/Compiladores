@@ -4,12 +4,12 @@ import puc.compiladores.lexico.Lexico;
 import puc.compiladores.lexico.LexicoException;
 import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
-import puc.compiladores.semantico.Semantico;
-import puc.compiladores.semantico.SimboloPrograma;
+import puc.compiladores.semantico.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 
 public class Sintatico {
 
@@ -20,8 +20,10 @@ public class Sintatico {
 	private Token previousTk;
 	private JTextArea textAreaErro;
 	private JTextArea textAreaCodigo;
+	private ArrayList<SimboloVariavel> simboloVariavelArrayList;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
+        simboloVariavelArrayList = new ArrayList<>();
 		textAreaError.setText("");
 	    textAreaErro = textAreaError;
 	    textAreaCodigo = textAreaCod;
@@ -44,13 +46,13 @@ public class Sintatico {
 						}
 						tk = sintaticoBuscaToken();
 						if (previousTk.getSimbolo().equals(Simbolo.SPONTO.getName()) && tk == null) {
-                            System.out.println(semantico.pesquisaDuplicidadeVariavel("a"));
+                            /*System.out.println(semantico.pesquisaDuplicidadeVariavel("a"));
                             System.out.println(semantico.pesquisaDuplicidadeVariavel("b"));
                             System.out.println(semantico.pesquisaDuplicidadeVariavel("x"));
                             System.out.println(semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos("analisa1"));
                             System.out.println(semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos("analisa4"));
                             System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("analisa1"));
-                            System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("func"));
+                            System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("func"));*/
 
 
                             semantico.imprime();
@@ -83,14 +85,14 @@ public class Sintatico {
 		controle++;
 	}
 
-	private void analisaBloco() throws SintaticoException, LexicoException {
+	private void analisaBloco() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		analisaEtVariaveis();
 		analisaSubRotinas();
 		analisaComandos();
 	}
 
-	private void analisaEtVariaveis() throws SintaticoException, LexicoException {
+	private void analisaEtVariaveis() throws SintaticoException, LexicoException, SemanticoException {
 		if (tk.getSimbolo().equals(Simbolo.SVAR.getName())) {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
@@ -108,20 +110,27 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaVariaveis() throws SintaticoException, LexicoException {
+	private void analisaVariaveis() throws SintaticoException, LexicoException, SemanticoException {
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-				tk = sintaticoBuscaToken();
-				if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName()) || tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
-					if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName())) {
-						tk = sintaticoBuscaToken();
-						if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
-							throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
-						}
-					}
-				} else {
-					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
-				}
+                if (!semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+                    simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", ""));
+                    semantico.insereTabelaSimbolos(new SimboloVariavel(tk.getLexema(), "", "", ""));
+                    tk = sintaticoBuscaToken();
+                    if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName()) || tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
+                        if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName())) {
+                            tk = sintaticoBuscaToken();
+                            if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
+                                throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
+                            }
+                            semantico.imprime();
+                        }
+                    } else {
+                        throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
+                    }
+                } else {
+                    throw SemanticoException.erroSemantico("Variavel duplicada", tk.getLinha(), textAreaErro, textAreaCodigo);
+                }
 			} else {
 				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
@@ -134,12 +143,17 @@ public class Sintatico {
 		if (!tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) && !tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
 			throw SintaticoException.erroSintatico("Tipo de variavel invalido", tk.getLinha(), textAreaErro, textAreaCodigo);
 		} else {
+            for (SimboloVariavel simboloVariavel:
+                 simboloVariavelArrayList) {
+                System.out.println("Colocando tipo na variavel " + simboloVariavel.getLexema() + " e o tipo é " + tk.getSimbolo());
+                semantico.colocaTipoTabela(simboloVariavel.getLexema(), tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) ? "inteiro" : "booleano");
+                semantico.imprime();
+            }
 			tk = sintaticoBuscaToken();
 		}
 	}
 
-	private void analisaComandos() throws SintaticoException, LexicoException {
-
+	private void analisaComandos() throws SintaticoException, LexicoException, SemanticoException {
 		if (tk.getSimbolo().equals(Simbolo.SINICIO.getName())) {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
@@ -159,7 +173,7 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaComandoSimples() throws SintaticoException, LexicoException {
+	private void analisaComandoSimples() throws SintaticoException, LexicoException, SemanticoException {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 			analisaAtribChProcedimento();
 		} else if (tk.getSimbolo()
@@ -188,17 +202,21 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaLeia() throws SintaticoException, LexicoException {
+	private void analisaLeia() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SABREPARENTESES.getName())) {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-				tk = sintaticoBuscaToken();
-				if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
-					tk = sintaticoBuscaToken();
-				} else {
-					throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
-				}
+			    if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+                    tk = sintaticoBuscaToken();
+                    if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
+                        tk = sintaticoBuscaToken();
+                    } else {
+                        throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
+                    }
+                } else {
+			        throw SemanticoException.erroSemantico("Variavel nao declarada", tk.getLinha(), textAreaErro, textAreaCodigo);
+                }
 			} else {
 				throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou passar identificador como parametro", tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
@@ -226,7 +244,7 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaEnquanto() throws SintaticoException, LexicoException {
+	private void analisaEnquanto() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		analisaExpressao();
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
@@ -237,7 +255,7 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaSe() throws SintaticoException, LexicoException {
+	private void analisaSe() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		analisaExpressao();
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
@@ -252,11 +270,11 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaSubRotinas() throws SintaticoException, LexicoException {
+	private void analisaSubRotinas() throws SintaticoException, LexicoException, SemanticoException {
 		// int flag = 0;
 		if (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SFUNCAO.getName())) {
-			// implementacao do semantico
+			// implementacao da geracao
 		}
 		while (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SFUNCAO.getName())) {
@@ -274,38 +292,59 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaDeclaracaoProcedimento() throws SintaticoException, LexicoException {
-			tk = sintaticoBuscaToken();
+	private void analisaDeclaracaoProcedimento() throws SintaticoException, LexicoException, SemanticoException {
+	    String nivel = "L";
+        tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-			tk = sintaticoBuscaToken();
-			if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
-				analisaBloco();
-			} else {
-				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
-			}
+		    if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(tk.getLexema())) {
+                semantico.insereTabelaSimbolos(new SimboloProcedimento(tk.getLexema(), nivel, ""));
+                tk = sintaticoBuscaToken();
+                if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
+                    analisaBloco();
+                } else {
+                    throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
+                }
+            } else {
+		        throw SemanticoException.erroSemantico("Procedimento ja existente", tk.getLinha(), textAreaErro, textAreaCodigo);
+            }
 		} else {
 			throw SintaticoException.erroSintatico("Faltou declarar nome do procedimento", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
-	private void analisaDeclaracaoFuncao() throws SintaticoException, LexicoException {
+	private void analisaDeclaracaoFuncao() throws SintaticoException, LexicoException, SemanticoException {
+	    Token temp;
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-			tk = sintaticoBuscaToken();
-			if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
-				tk = sintaticoBuscaToken();
-				if (tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) ||
-				tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
-					tk = sintaticoBuscaToken();
-					if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
-						analisaBloco();
-					}
-				} else {
-					throw SintaticoException.erroSintatico("Faltou declarar tipo da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
-				}
-			} else {
-				throw SintaticoException.erroSintatico("Faltou caracter ':'", tk.getLinha(), textAreaErro, textAreaCodigo);
-			}
+            if (!semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
+                temp = tk;
+                semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", ""));
+                tk = sintaticoBuscaToken();
+                if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
+                    tk = sintaticoBuscaToken();
+                    if (tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) ||
+                            tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
+                        if (tk.getSimbolo().equals(Simbolo.SINTEIRO.getName())) {
+                            // funcao do tipo inteiro
+                            semantico.colocaTipoTabela(temp.getLexema(), "inteiro");
+                        } else {
+                            // funcao do tipo booleano
+                            semantico.colocaTipoTabela(temp.getLexema(), "booleano");
+                        }
+                        semantico.imprime();
+                        tk = sintaticoBuscaToken();
+                        if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
+                            analisaBloco();
+                        }
+                    } else {
+                        throw SintaticoException.erroSintatico("Faltou declarar tipo da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
+                    }
+                } else {
+                    throw SintaticoException.erroSintatico("Faltou caracter ':'", tk.getLinha(), textAreaErro, textAreaCodigo);
+                }
+            } else {
+                throw SemanticoException.erroSemantico("Funcao ja declarada", tk.getLinha(), textAreaErro, textAreaCodigo);
+            }
 		} else {
 			throw SintaticoException.erroSintatico("Fatlou declarar nome da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
