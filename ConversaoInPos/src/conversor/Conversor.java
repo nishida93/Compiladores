@@ -28,6 +28,8 @@ public class Conversor {
                 elemento.contains("e") || elemento.contains("ou")) {
 
                 trataElemento(elemento);
+            } else if(elemento.contains(")")){
+                desempilhaParenteses();
             } else {
                 pilhaPosFixa.add(elemento);
             }
@@ -35,6 +37,19 @@ public class Conversor {
         desempilha(0);
 
         return pilhaPosFixa;
+    }
+
+    private void desempilhaParenteses() {
+        int i;
+        for (i = pilhaAux.size(); i > 0; i--) {
+            pilhaPosFixa.add(pilhaAux.get(i - 1));
+            if(pilhaPosFixa.get(i - 1).equals("(")){
+                pilhaAux.remove(i - 1);
+                pilhaPosFixa.remove(i - 1);
+                break;
+            }
+            pilhaAux.remove(i - 1);
+        }
     }
 
     private void desempilha(int parada) {
@@ -110,12 +125,18 @@ public class Conversor {
 
     private List<String> setup() {
 
+        pilhaInFixa.add("(");
+        pilhaInFixa.add("(");
         pilhaInFixa.add("a");
         pilhaInFixa.add("+");
         pilhaInFixa.add("b");
+        pilhaInFixa.add(")");
+        pilhaInFixa.add("-");
+        pilhaInFixa.add("45");
+        pilhaInFixa.add(")");
         pilhaInFixa.add("*");
         pilhaInFixa.add("c");
-        pilhaInFixa.add("-");
+        pilhaInFixa.add("*");
         pilhaInFixa.add("10");
 
         return pilhaInFixa;
