@@ -32,7 +32,7 @@ public class Compilador extends JFrame {
     }
 
     private void buttonExecutarActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        // TODO empilha your code here
     }
 
     private void abrirArquivo() {
@@ -163,7 +163,7 @@ public class Compilador extends JFrame {
 
             //======== panelCodigo ========
             {
-                panelCodigo.setPreferredSize(new Dimension(0, 300));
+                panelCodigo.setPreferredSize(new Dimension(0, 550));
                 panelCodigo.setLayout(new BorderLayout());
 
                 //======== scrollPaneCodigo ========

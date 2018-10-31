@@ -45,10 +45,8 @@ public class Lexico {
     }
 
     public Token getToken() throws LexicoException {
-        System.out.println("Entrou no Lexico para pegar Token com controle = " + controle);
         while (controle < characterArrayList.size()) {
             t = null;
-            System.out.println("Entrou no while com caracter >>> " + characterArrayList.get(controle).toString());
             if (characterArrayList.get(controle).toString().equals(" ") ||
                     characterArrayList.get(controle).toString().equals("") ||
                     characterArrayList.get(controle).toString().equals("\r") ||
@@ -75,8 +73,6 @@ public class Lexico {
                 } catch (IndexOutOfBoundsException e) {
 
                 }
-
-                System.out.println("Fechou o comentario");
                 controle++;
             }
             else if(Character.isDigit(characterArrayList.get(controle)))
@@ -113,7 +109,6 @@ public class Lexico {
                 qtdTokens++;
                 System.out.println("Está retornando o Token >>> " + t.toString());
                 return t;
-                //listaToken.add(t);
             }
             controle++;
         }
@@ -285,7 +280,6 @@ public class Lexico {
 
         String str = id.toString();
 
-        System.out.println("Setando lexema para > " + str);
         t.setLexema(str);
 
         switch (str) {
@@ -328,12 +322,6 @@ public class Lexico {
             case "booleano":
                 t.setSimbolo(Simbolo.SBOOLEANO.getName());
                 break;
-            /*case "verdadeiro":
-                t.setSimbolo(Simbolo.);
-                break;
-            case "falso":
-                t.setSimbolo("sfalso");
-                break;*/
             case "procedimento":
                 t.setSimbolo(Simbolo.SPROCEDIMENTO.getName());
                 break;

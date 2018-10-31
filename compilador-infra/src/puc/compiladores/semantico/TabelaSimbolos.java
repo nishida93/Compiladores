@@ -1,6 +1,7 @@
 package puc.compiladores.semantico;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class TabelaSimbolos {
 
@@ -10,17 +11,34 @@ public class TabelaSimbolos {
         pilha = new ArrayList<>();
     }
 
-    public void add(Simbolo o) {
+    public void empilha(Simbolo o) {
+        System.out.println("Empilhando o simbolo >>> " + o.toString());
         pilha.add(o);
     }
 
-    public boolean existeVariavel(final String lexema) {
-        for (Simbolo simbolo :
-                pilha) {
-            if (simbolo.getLexema().equals(lexema) && simbolo instanceof SimboloVariavel) {
+    public boolean verificaDuplicidade(final String lexema) {
+        for (Simbolo simbolo: pilha) {
+            if (simbolo.getLexema().equals(lexema) && (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma)) {
                 return true;
             }
         }
+        return false;
+    }
+
+    public boolean existeVariavel(final String lexema) {
+        Collections.reverse(pilha);
+        for (Simbolo simbolo :
+                pilha) {
+            //System.out.println("EXISTE VARIAVEL COM SIMBOLO > " + simbolo.toString());
+            if (simbolo.getLexema().equals(lexema)) {
+                Collections.reverse(pilha);
+                return true;
+            }
+            if (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma) {
+                continue;
+            }
+        }
+        Collections.reverse(pilha);
         return false;
     }
 
@@ -70,4 +88,33 @@ public class TabelaSimbolos {
 			}
 		}
 	}
+
+    public void desempilha(final String lexemaEscopo) {
+        ArrayList<Simbolo> tmpToRemove = new ArrayList<>();
+        Collections.reverse(pilha);
+        System.out.println("Desempilhando ate LEXEMA >" + lexemaEscopo);
+        for (Simbolo simbolo: pilha) {
+            if (simbolo.getLexema().equals(lexemaEscopo)) {
+                break;
+            } /*else if (simbolo instanceof SimboloPrograma || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloFuncao) {
+                continue;
+            }*/
+            System.out.println("Desempilhando o simbolo >> " + simbolo.toString());
+            tmpToRemove.add(simbolo);
+        }
+        pilha.removeAll(tmpToRemove);
+        Collections.reverse(pilha);
+        imprime();
+    }
+
+    public boolean verificaSeTipoInteiro(final String lexema) {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo.getLexema()
+                       .equals(lexema) && simbolo instanceof SimboloVariavel && ((SimboloVariavel) simbolo).getTipoVariavel()
+                                                                                                           .equals("inteiro")) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
