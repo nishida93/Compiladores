@@ -32,23 +32,27 @@ public class Conversor {
                 pilhaPosFixa.add(elemento);
             }
         }
-        desempilha();
+        desempilha(0);
 
         return pilhaPosFixa;
     }
 
-    private void desempilha() {
+    private void desempilha(int parada) {
         int i;
         for (i = pilhaAux.size(); i > 0; i--) {
-            pilhaPosFixa.add(pilhaAux.get(i));
-            pilhaAux.remove(i);
+            pilhaPosFixa.add(pilhaAux.get(i - 1));
+            if(prioridade(pilhaAux.get(i - 1)) == parada){
+                pilhaAux.remove(i - 1);
+                break;
+            }
+            pilhaAux.remove(i - 1);
         }
     }
     private void trataElemento(String elemento) {
         if(elemento.contains("+") || elemento.contains("-")){
-            verificaPilha(elemento, 2);
+            verificaPilha(elemento, 4);
         } else if(elemento.contains("*") || elemento.contains("div")) {
-            verificaPilha(elemento, 1);
+            verificaPilha(elemento, 5);
 
         } else if(elemento.contains(">") || elemento.contains("<") ||
                 elemento.contains(">=") || elemento.contains("<=") ||
@@ -56,10 +60,10 @@ public class Conversor {
             verificaPilha(elemento, 3);
 
         } else if(elemento.contains("e")) {
-            verificaPilha(elemento, 4);
+            verificaPilha(elemento, 2);
 
         } else if(elemento.contains("ou")){
-            verificaPilha(elemento, 5);
+            verificaPilha(elemento, 1);
 
         }
     }
@@ -70,8 +74,9 @@ public class Conversor {
         if(pilhaAux.size() != 0) {
             for (String expressao: pilhaAux) {
                 int prioridadeAux = prioridade(expressao);
-                if(prioridadeAux < prioridadeElemento) {
-                    pilhaPosFixa.add(expressao);
+                if(prioridadeAux >= prioridadeElemento) {
+                    desempilha(prioridadeElemento);
+                    pilhaAux.add(elemento);
                     flag = false;
                 }
                 aux++;
@@ -87,21 +92,20 @@ public class Conversor {
     }
 
     private int prioridade(String expressao) {
-        int i = 0;
         if(expressao.equals("+") || expressao.equals("-")){
-            return 2;
+            return 4;
         } else if(expressao.equals("*") || expressao.equals("div")) {
-            return 1;
+            return 5;
         } else if(expressao.equals(">") || expressao.equals("<") ||
                 expressao.equals(">=") || expressao.equals("<=") ||
                 expressao.equals("=") || expressao.equals("!")) {
             return 3;
         } else if(expressao.equals("e")) {
-            return 4;
+            return 2;
         } else if(expressao.equals("ou")){
-            return 5;
+            return 1;
         }
-        return i;
+        return 0;
     }
 
     private List<String> setup() {
