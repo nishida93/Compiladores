@@ -21,6 +21,8 @@ public class Sintatico {
 	private JTextArea textAreaErro;
 	private JTextArea textAreaCodigo;
 	private ArrayList<SimboloVariavel> simboloVariavelArrayList;
+	private String lexemaEscopo;
+	private String lexemaEscopoAux;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         simboloVariavelArrayList = new ArrayList<>();
@@ -46,16 +48,7 @@ public class Sintatico {
 						}
 						tk = sintaticoBuscaToken();
 						if (previousTk.getSimbolo().equals(Simbolo.SPONTO.getName()) && tk == null) {
-                            /*System.out.println(semantico.pesquisaDuplicidadeVariavel("a"));
-                            System.out.println(semantico.pesquisaDuplicidadeVariavel("b"));
-                            System.out.println(semantico.pesquisaDuplicidadeVariavel("x"));
-                            System.out.println(semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos("analisa1"));
-                            System.out.println(semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos("analisa4"));
-                            System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("analisa1"));
-                            System.out.println(semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos("func"));*/
-
-
-                            semantico.imprime();
+                            //semantico.imprime();
 							System.out.println("SINTATICO EXECUTADO COM SUCESSO");
 							textAreaErro.setText("EXECUTADO COM SUCESSO");
 							textAreaErro.setForeground(Color.GREEN);
@@ -113,7 +106,7 @@ public class Sintatico {
 	private void analisaVariaveis() throws SintaticoException, LexicoException, SemanticoException {
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-                if (!semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+                if (!semantico.existeDuplicidadeVariavel(tk.getLexema())) {
                     simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", ""));
                     semantico.insereTabelaSimbolos(new SimboloVariavel(tk.getLexema(), "", "", ""));
                     tk = sintaticoBuscaToken();
@@ -123,7 +116,7 @@ public class Sintatico {
                             if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
                                 throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
                             }
-                            semantico.imprime();
+                            //semantico.imprime();
                         }
                     } else {
                         throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -145,10 +138,11 @@ public class Sintatico {
 		} else {
             for (SimboloVariavel simboloVariavel:
                  simboloVariavelArrayList) {
-                System.out.println("Colocando tipo na variavel " + simboloVariavel.getLexema() + " e o tipo é " + tk.getSimbolo());
+                //System.out.println("Colocando tipo na variavel " + simboloVariavel.getLexema() + " e o tipo é " + tk.getSimbolo());
                 semantico.colocaTipoTabela(simboloVariavel.getLexema(), tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) ? "inteiro" : "booleano");
-                semantico.imprime();
+                //semantico.imprime();
             }
+            simboloVariavelArrayList = new ArrayList<>();
 			tk = sintaticoBuscaToken();
 		}
 	}
@@ -166,6 +160,17 @@ public class Sintatico {
 				} else {
 					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
+			}
+			// System.out.println("Finalizando func/proc " + lexemaEscopo);
+			if (lexemaEscopo != null) {
+				System.out.println("Desempilhando ate > " + lexemaEscopo);
+				semantico.desempilhaSimbolos(lexemaEscopo);
+				lexemaEscopo = null;
+			}
+			if (lexemaEscopoAux != null) {
+				System.out.println("Desempilhando ate > " + lexemaEscopoAux);
+				semantico.desempilhaSimbolos(lexemaEscopoAux);
+				lexemaEscopoAux = null;
 			}
 			tk = sintaticoBuscaToken();
 		} else {
@@ -193,12 +198,13 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaAtribChProcedimento() throws SintaticoException, LexicoException {
+	private void analisaAtribChProcedimento() throws SintaticoException, LexicoException, SemanticoException {
+		Token token = tk;
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SATRIBUICAO.getName())) {
 			analisaAtribuicao();
 		} else {
-			analisaChamadaProcedimento();
+			analisaChamadaProcedimento(token);
 		}
 	}
 
@@ -208,12 +214,16 @@ public class Sintatico {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 			    if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
-                    tk = sintaticoBuscaToken();
-                    if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
-                        tk = sintaticoBuscaToken();
-                    } else {
-                        throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
-                    }
+			    	if (semantico.isTipoInteiro(tk.getLexema())) {
+						tk = sintaticoBuscaToken();
+						if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
+							tk = sintaticoBuscaToken();
+						} else {
+							throw SintaticoException.erroSintatico("[ANALISA LEIA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
+						}
+					} else {
+			    		throw SemanticoException.erroSemantico("Incompatibilidade de tipo", tk.getLinha(), textAreaErro, textAreaCodigo);
+					}
                 } else {
 			        throw SemanticoException.erroSemantico("Variavel nao declarada", tk.getLinha(), textAreaErro, textAreaCodigo);
                 }
@@ -225,16 +235,24 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaEscreva() throws SintaticoException, LexicoException {
+	private void analisaEscreva() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SABREPARENTESES.getName())) {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-				tk = sintaticoBuscaToken();
-				if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
-					tk = sintaticoBuscaToken();
+				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+					if (semantico.isTipoInteiro(tk.getLexema())) {
+						tk = sintaticoBuscaToken();
+						if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
+							tk = sintaticoBuscaToken();
+						} else {
+							throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
+						}
+					} else {
+						throw SemanticoException.erroSemantico("Incompatibilidade de tipo", tk.getLinha(), textAreaErro, textAreaCodigo);
+					}
 				} else {
-					throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou fechar parenteses", tk.getLinha(), textAreaErro, textAreaCodigo);
+					throw SemanticoException.erroSemantico("Variavel nao declarada", tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			} else {
 				throw SintaticoException.erroSintatico("[ANALISA ESCREVA] Faltou passar identificador como parametro", tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -297,6 +315,11 @@ public class Sintatico {
         tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 		    if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(tk.getLexema())) {
+				System.out.println("Novo procedimento chamada::: " + tk.getLexema());
+				if (lexemaEscopo != null) { // para nao perder procedimentos dentro de outros procedimentos
+					lexemaEscopoAux = lexemaEscopo;
+				}
+		    	lexemaEscopo = tk.getLexema();
                 semantico.insereTabelaSimbolos(new SimboloProcedimento(tk.getLexema(), nivel, ""));
                 tk = sintaticoBuscaToken();
                 if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
@@ -319,6 +342,11 @@ public class Sintatico {
             if (!semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
                 temp = tk;
                 semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", ""));
+				System.out.println("Nova funcao chamada::: " + tk.getLexema());
+				if (lexemaEscopo != null) { // para nao perder procedimentos dentro de outros procedimentos
+					lexemaEscopoAux = lexemaEscopo;
+				}
+				lexemaEscopo = tk.getLexema();
                 tk = sintaticoBuscaToken();
                 if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
                     tk = sintaticoBuscaToken();
@@ -331,7 +359,7 @@ public class Sintatico {
                             // funcao do tipo booleano
                             semantico.colocaTipoTabela(temp.getLexema(), "booleano");
                         }
-                        semantico.imprime();
+                        //semantico.imprime();
                         tk = sintaticoBuscaToken();
                         if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
                             analisaBloco();
@@ -350,7 +378,7 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaExpressao() throws SintaticoException, LexicoException {
+	private void analisaExpressao() throws SintaticoException, LexicoException, SemanticoException {
 		analisaExpressaoSimples();
 		if (tk.getSimbolo().equals(Simbolo.SMAIOR.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SMAIORIG.getName()) ||
@@ -364,9 +392,11 @@ public class Sintatico {
 
 	}
 
-	private void analisaExpressaoSimples() throws SintaticoException, LexicoException {
+	private void analisaExpressaoSimples() throws SintaticoException, LexicoException, SemanticoException {
+		// Unario
 		if (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SMENOS.getName())) {
+			// add
             tk = sintaticoBuscaToken();
         }
         analisaTermo();
@@ -379,7 +409,7 @@ public class Sintatico {
 
 	}
 
-	private void analisaTermo() throws SintaticoException, LexicoException {
+	private void analisaTermo() throws SintaticoException, LexicoException, SemanticoException {
 		analisaFator();
 		while (tk.getSimbolo().equals(Simbolo.SMULT.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SDIV.getName()) ||
@@ -389,9 +419,16 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaFator() throws SintaticoException, LexicoException {
+	private void analisaFator() throws SintaticoException, LexicoException, SemanticoException {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-			analisaChamadaFuncao();
+			// addd
+			if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) { // eh uma funcao
+				analisaChamadaFuncao();
+			} else if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+				tk = sintaticoBuscaToken();
+			} else {
+				throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tk.getLinha(), textAreaErro, textAreaCodigo);
+			}
 		} else if (tk.getSimbolo().equals(Simbolo.SNUMERO.getName())) {
 			tk = sintaticoBuscaToken();
 		} else if (tk.getSimbolo().equals(Simbolo.SNAO.getName())) {
@@ -413,15 +450,21 @@ public class Sintatico {
 		}
 	}
 
-	private void analisaChamadaFuncao() throws LexicoException {
-		tk = sintaticoBuscaToken();
+	private void analisaChamadaFuncao() throws LexicoException, SemanticoException {
+		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
+			tk = sintaticoBuscaToken();
+		} else {
+			throw SemanticoException.erroSemantico("Chamada de funcao invalida, pois funcao nao existe", tk.getLinha(), textAreaErro, textAreaCodigo);
+		}
 	}
 
-	private void analisaChamadaProcedimento() {
-
+	private void analisaChamadaProcedimento(final Token token) throws SemanticoException, LexicoException {
+		if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(token.getLexema())) {
+			throw SemanticoException.erroSemantico("Chamada de procedimento invalida, pois procedimento nao existe", tk.getLinha(), textAreaErro, textAreaCodigo);
+		}
 	}
 
-	private void analisaAtribuicao() throws SintaticoException, LexicoException {
+	private void analisaAtribuicao() throws SintaticoException, LexicoException, SemanticoException {
         tk = sintaticoBuscaToken();
 
         analisaExpressao();

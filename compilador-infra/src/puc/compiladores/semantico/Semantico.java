@@ -4,10 +4,22 @@ public class Semantico {
 
     TabelaSimbolos tabelaSimbolos;
 
+    /**
+     * No momento de declarar variavel:
+     * mesmo escopo: var com mesmo nome
+     *
+     * ate inicio da tab de simb: proc, funcao nome de prog com mesmo nome
+     */
+
+
+
     public Semantico() {
         tabelaSimbolos = new TabelaSimbolos();
     }
 
+    public boolean existeDuplicidadeVariavel(final String lexema) {
+        return tabelaSimbolos.verificaDuplicidade(lexema);
+    }
     /**
      * Pesquisa declaracao de variavel na tabela de simbolos
      *
@@ -58,7 +70,7 @@ public class Semantico {
      * @param simbolo
      */
     public void insereTabelaSimbolos(Simbolo simbolo) {
-        tabelaSimbolos.add(simbolo);
+        tabelaSimbolos.empilha(simbolo);
     }
 
     /**
@@ -79,4 +91,11 @@ public class Semantico {
         tabelaSimbolos.colocaTipo(lexema, tipo);
     }
 
+    public void desempilhaSimbolos(final String lexemaEscopo) {
+        tabelaSimbolos.desempilha(lexemaEscopo);
+    }
+
+    public boolean isTipoInteiro(final String lexema) {
+        return tabelaSimbolos.verificaSeTipoInteiro(lexema);
+    }
 }
