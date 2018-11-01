@@ -19,20 +19,31 @@ public class Conversor {
     }
 
     private List<String> trataPilha() {
+        String auxElemento = "";
+        int aux = 0;
         for (String elemento: pilhaInFixa) {
-            if(elemento.contains("+") || elemento.contains("-") ||
-                elemento.contains("*") || elemento.contains("div") ||
-                elemento.contains(">") || elemento.contains("<") ||
-                elemento.contains(">=") || elemento.contains("<=") ||
-                elemento.contains("=") || elemento.contains("!") ||
-                elemento.contains("e") || elemento.contains("ou")) {
-
+            if(elemento.equals("+") || elemento.equals("-") ||
+                elemento.equals("*") || elemento.equals("div") ||
+                elemento.equals(">") || elemento.equals("<") ||
+                elemento.equals(">=") || elemento.equals("<=") ||
+                elemento.equals("=") || elemento.equals("!") ||
+                elemento.equals("e") || elemento.equals("ou")) {
+                auxElemento = elemento;
                 trataElemento(elemento);
-            } else if(elemento.contains(")")){
+            } else if(elemento.equals(")")){
+                auxElemento = elemento;
                 desempilhaParenteses();
+            } else if(elemento.equals("+u") ||
+                    elemento.equals("-u") || elemento.equals("nao")) {
+                auxElemento = elemento;
             } else {
                 pilhaPosFixa.add(elemento);
+                if(auxElemento.equals("+u") ||
+                        auxElemento.equals("-u") || auxElemento.equals("nao")){
+                    pilhaPosFixa.add(auxElemento);
+                }
             }
+            aux++;
         }
         desempilha(0);
 
@@ -64,20 +75,20 @@ public class Conversor {
         }
     }
     private void trataElemento(String elemento) {
-        if(elemento.contains("+") || elemento.contains("-")){
+        if(elemento.equals("+") || elemento.equals("-")){
             verificaPilha(elemento, 4);
-        } else if(elemento.contains("*") || elemento.contains("div")) {
+        } else if(elemento.equals("*") || elemento.equals("div")) {
             verificaPilha(elemento, 5);
 
-        } else if(elemento.contains(">") || elemento.contains("<") ||
-                elemento.contains(">=") || elemento.contains("<=") ||
-                elemento.contains("=") || elemento.contains("!")) {
+        } else if(elemento.equals(">") || elemento.equals("<") ||
+                elemento.equals(">=") || elemento.equals("<=") ||
+                elemento.equals("=") || elemento.equals("!")) {
             verificaPilha(elemento, 3);
 
-        } else if(elemento.contains("e")) {
+        } else if(elemento.equals("e")) {
             verificaPilha(elemento, 2);
 
-        } else if(elemento.contains("ou")){
+        } else if(elemento.equals("ou")){
             verificaPilha(elemento, 1);
 
         }
@@ -127,6 +138,7 @@ public class Conversor {
 
         pilhaInFixa.add("(");
         pilhaInFixa.add("(");
+        pilhaInFixa.add("-u");
         pilhaInFixa.add("a");
         pilhaInFixa.add("+");
         pilhaInFixa.add("b");
