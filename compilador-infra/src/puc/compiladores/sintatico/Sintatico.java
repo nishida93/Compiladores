@@ -266,6 +266,8 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		analisaExpressao();
+		System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
+		printaExpressao();
 		arrayExpressao = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
 			tk = sintaticoBuscaToken();
@@ -279,6 +281,8 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		analisaExpressao();
+		System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
+		printaExpressao();
 		arrayExpressao = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
 			tk = sintaticoBuscaToken();
@@ -393,7 +397,9 @@ public class Sintatico {
 			tk = sintaticoBuscaToken();
 			analisaExpressaoSimples();
 		}
-		System.out.println("EXPRESSAO GERADA >>> ");
+	}
+
+	private void printaExpressao() {
 		for (String valor : arrayExpressao) {
 			System.out.println(valor);
 		}
@@ -484,6 +490,8 @@ public class Sintatico {
 
 		arrayExpressao = new ArrayList<>();
         analisaExpressao();
+		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO:::");
+		printaExpressao();
 		arrayExpressao = new ArrayList<>();
 	}
 }
