@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.*;
@@ -29,7 +30,7 @@ public class VM extends JFrame {
     private DefaultTableModel modelTabelaPilha = new DefaultTableModel();
     private ArrayList<String> listArquivo;
     private int linha = 0;
-    private Pilha affPilha = new Pilha();
+    private Pilha pilhaNova = new Pilha();
 
     public VM() {
         jFileChooser = new JFileChooser();
@@ -45,7 +46,6 @@ public class VM extends JFrame {
     }
 
     private void menuItem1ActionPerformed(ActionEvent e) {
-
         JFileChooser fileChooser = new JFileChooser();
         listArquivo = new ArrayList<>();
         int result = fileChooser.showOpenDialog(this);
@@ -60,18 +60,17 @@ public class VM extends JFrame {
             }
         }
         new Arquivo(tableInstrucoes, listArquivo);
-
-    }
-
-    private void menuFecharActionPerformed(ActionEvent e) {
-        new Arquivo().fechar();
     }
 
     private void btnCompilarActionPerformed(ActionEvent e) {
         // TODO add your code here
         Arquivo arquivo = new Arquivo();
-        int aux = arquivo.stepByStep(tableInstrucoes, tablePilha,
-                listArquivo, this, linha, affPilha);
+        int aux = executaTudo(arquivo, tablePilha);
+    }
+
+    private int executaTudo(Arquivo arquivo, JTable tablePilhaNova) {
+        int aux = arquivo.stepByStep(tableInstrucoes, tablePilhaNova,
+                listArquivo, this, linha, pilhaNova);
         System.out.println("AUX = " + aux);
         if(aux == -99) {
             System.out.println("tem que parar!");
@@ -83,19 +82,53 @@ public class VM extends JFrame {
         }else {
             linha = aux;
         }
+        return aux;
     }
 
     private void menuItemCompilarActionPerformed(ActionEvent e) {
-        new Arquivo(tablePilha, false, listArquivo, this);
+        linha = 0;
+        clearOutput();
+        btnContinuar.setEnabled(false);
+        Arquivo arquivo = new Arquivo();
+        int aux = 0;
+        while (aux != -99){
+            aux = executaTudo(arquivo, tablePilha);
+        }
     }
 
-    private void menuItemDebuggarActionPerformed(ActionEvent e) {
-        //System.out.println("ARQUIVO> " + listArquivo);
+    private String[] separaBreakPoints(String breakPoints) {
+        String[] params = breakPoints.split(" ");
+        return params;
+    }
+
+    private void menuItemDebuggarActionPerformed(ActionEvent e, int inicio) {
+        linha = 0;
+        int k = 0;
+        clearOutput();
+        Arquivo arquivo = new Arquivo();
+        String checkout = arquivo.debuggar(this);
+        String[] breakPoint = separaBreakPoints(checkout);
+        int tamanho = arquivo.getTamanhoArquivo(listArquivo);
+        for(int i = 0; i < tamanho; i++) {
+            if(k < breakPoint.length) {
+                if(linha == Integer.parseInt(breakPoint[k]) && null != breakPoint[k]) {
+                    int a = arquivo.btnContinuar(this);
+                    System.out.println("a = " + a);
+                    k++;
+                }
+            }
+            i = executaTudo(arquivo, tablePilha);
+            if(-99 == i){
+                break;
+            }
+        }
+    }
+
+    private void menuItemStepByStepActionPerformed(ActionEvent e) {
         linha = 0;
         clearOutput();
         btnContinuar.setEnabled(true);
         btnCompilarActionPerformed(e);
-        //new Arquivo(tablePilha, true, listArquivo, this);
     }
 
     @SuppressWarnings("unchecked")
@@ -111,7 +144,7 @@ public class VM extends JFrame {
         modelTabelaPilha.addColumn("Valor");
 
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        // Generated using JFormDesigner Evaluation license - Matheus
+        // Generated using JFormDesigner Evaluation license - Luan Bonomi
         menuBar = new JMenuBar();
         menuArquivo = new JMenu();
         menuItemAbrir = new JMenuItem();
@@ -119,6 +152,7 @@ public class VM extends JFrame {
         menuExecutar = new JMenu();
         menuItemCompilar = new JMenuItem();
         menuItemDebuggar = new JMenuItem();
+        menuItemStepByStep = new JMenuItem();
         menuSobre = new JMenu();
         menuItemSobre = new JMenuItem();
         panel1 = new JPanel();
@@ -126,18 +160,10 @@ public class VM extends JFrame {
         scrollTabelaInstrucoes = new JScrollPane();
         tableInstrucoes = new JTable(modelTabelaInstrucoes);
         panel3 = new JPanel();
-        panel4 = new JPanel();
-        lblEntrada = new JLabel();
-        scrollEntrada = new JScrollPane();
-        textAreaEntrada = new JTextArea();
         panel5 = new JPanel();
         lblSaida = new JLabel();
         scrollSaida = new JScrollPane();
         textAreaSaida = new JTextArea();
-        panel6 = new JPanel();
-        lblBreakPoints = new JLabel();
-        scrollBreakPoints = new JScrollPane();
-        textAreaBreakPoints = new JTextArea();
         btnContinuar = new JButton();
         panel2 = new JPanel();
         lblPilha = new JLabel();
@@ -176,8 +202,13 @@ public class VM extends JFrame {
 
                 //---- menuItemDebuggar ----
                 menuItemDebuggar.setText("Debuggar");
-                menuItemDebuggar.addActionListener(e -> menuItemDebuggarActionPerformed(e));
+                menuItemDebuggar.addActionListener(e -> menuItemDebuggarActionPerformed(e, 0));
                 menuExecutar.add(menuItemDebuggar);
+
+                //---- menuItemStepByStep ----
+                menuItemStepByStep.setText("Step by Step");
+                menuItemStepByStep.addActionListener(e -> menuItemStepByStepActionPerformed(e));
+                menuExecutar.add(menuItemStepByStep);
             }
             menuBar.add(menuExecutar);
 
@@ -220,30 +251,6 @@ public class VM extends JFrame {
                 panel3.setBorder(LineBorder.createBlackLineBorder());
                 panel3.setLayout(new BorderLayout());
 
-                //======== panel4 ========
-                {
-                    panel4.setPreferredSize(new Dimension(200, 32));
-                    panel4.setForeground(new Color(153, 153, 153));
-                    panel4.setBorder(LineBorder.createBlackLineBorder());
-                    panel4.setLayout(new BorderLayout());
-
-                    //---- lblEntrada ----
-                    lblEntrada.setText("Janela de Entrada");
-                    lblEntrada.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblEntrada.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-                    lblEntrada.setBorder(LineBorder.createBlackLineBorder());
-                    panel4.add(lblEntrada, BorderLayout.NORTH);
-
-                    //======== scrollEntrada ========
-                    {
-
-                        //---- textAreaEntrada ----
-                        scrollEntrada.setViewportView(textAreaEntrada);
-                    }
-                    panel4.add(scrollEntrada, BorderLayout.CENTER);
-                }
-                panel3.add(panel4, BorderLayout.WEST);
-
                 //======== panel5 ========
                 {
                     panel5.setPreferredSize(new Dimension(200, 200));
@@ -266,29 +273,6 @@ public class VM extends JFrame {
                     panel5.add(scrollSaida, BorderLayout.CENTER);
                 }
                 panel3.add(panel5, BorderLayout.CENTER);
-
-                //======== panel6 ========
-                {
-                    panel6.setPreferredSize(new Dimension(200, 32));
-                    panel6.setBorder(LineBorder.createBlackLineBorder());
-                    panel6.setLayout(new BorderLayout());
-
-                    //---- lblBreakPoints ----
-                    lblBreakPoints.setText("Break Points");
-                    lblBreakPoints.setFont(new Font(".SF NS Text", Font.BOLD | Font.ITALIC, 13));
-                    lblBreakPoints.setHorizontalAlignment(SwingConstants.CENTER);
-                    lblBreakPoints.setBorder(LineBorder.createBlackLineBorder());
-                    panel6.add(lblBreakPoints, BorderLayout.NORTH);
-
-                    //======== scrollBreakPoints ========
-                    {
-
-                        //---- textAreaBreakPoints ----
-                        scrollBreakPoints.setViewportView(textAreaBreakPoints);
-                    }
-                    panel6.add(scrollBreakPoints, BorderLayout.CENTER);
-                }
-                panel3.add(panel6, BorderLayout.EAST);
 
                 //---- btnContinuar ----
                 btnContinuar.setText("Continuar");
@@ -331,7 +315,7 @@ public class VM extends JFrame {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    // Generated using JFormDesigner Evaluation license - Matheus
+    // Generated using JFormDesigner Evaluation license - Luan Bonomi
     private JMenuBar menuBar;
     private JMenu menuArquivo;
     private JMenuItem menuItemAbrir;
@@ -339,6 +323,7 @@ public class VM extends JFrame {
     private JMenu menuExecutar;
     private JMenuItem menuItemCompilar;
     private JMenuItem menuItemDebuggar;
+    private JMenuItem menuItemStepByStep;
     private JMenu menuSobre;
     private JMenuItem menuItemSobre;
     private JPanel panel1;
@@ -346,18 +331,10 @@ public class VM extends JFrame {
     private JScrollPane scrollTabelaInstrucoes;
     private JTable tableInstrucoes;
     private JPanel panel3;
-    private JPanel panel4;
-    private JLabel lblEntrada;
-    private JScrollPane scrollEntrada;
-    private JTextArea textAreaEntrada;
     private JPanel panel5;
     private JLabel lblSaida;
     private JScrollPane scrollSaida;
     private JTextArea textAreaSaida;
-    private JPanel panel6;
-    private JLabel lblBreakPoints;
-    private JScrollPane scrollBreakPoints;
-    private JTextArea textAreaBreakPoints;
     private JButton btnContinuar;
     private JPanel panel2;
     private JLabel lblPilha;
