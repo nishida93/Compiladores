@@ -1,33 +1,36 @@
-package conversor;
+package puc.compiladores.posfixa;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class Conversor {
+public class ConversorPosfixa {
 
-    List<String> pilhaInFixa = new ArrayList();
-    List<String> pilhaPosFixa = new ArrayList();
-    List<String> pilhaAux = new ArrayList();
+    ArrayList<String> pilhaInFixa = new ArrayList();
+    ArrayList<String> pilhaPosFixa = new ArrayList();
+    ArrayList<String> pilhaAux = new ArrayList();
 
-    public Conversor() {
-        setup();
-
+    public ConversorPosfixa() {
         trataPilha();
-
         System.out.println("pilha = " + pilhaInFixa);
         System.out.println("pilha Pos = " + pilhaPosFixa);
     }
 
-    private List<String> trataPilha() {
+    public ArrayList<String> pilhaTratada(ArrayList<String> arrayExpressao) {
+        pilhaInFixa = arrayExpressao;
+        trataPilha();
+
+        return pilhaPosFixa;
+    }
+
+    private ArrayList<String> trataPilha() {
         String auxElemento = "";
         int aux = 0;
         for (String elemento: pilhaInFixa) {
             if(elemento.equals("+") || elemento.equals("-") ||
-                elemento.equals("*") || elemento.equals("div") ||
-                elemento.equals(">") || elemento.equals("<") ||
-                elemento.equals(">=") || elemento.equals("<=") ||
-                elemento.equals("=") || elemento.equals("!") ||
-                elemento.equals("e") || elemento.equals("ou")) {
+                    elemento.equals("*") || elemento.equals("div") ||
+                    elemento.equals(">") || elemento.equals("<") ||
+                    elemento.equals(">=") || elemento.equals("<=") ||
+                    elemento.equals("=") || elemento.equals("!") ||
+                    elemento.equals("e") || elemento.equals("ou")) {
                 auxElemento = elemento;
                 trataElemento(elemento);
             } else if(elemento.equals(")")){
@@ -134,23 +137,4 @@ public class Conversor {
         return 0;
     }
 
-    private List<String> setup() {
-
-        pilhaInFixa.add("(");
-        pilhaInFixa.add("(");
-        pilhaInFixa.add("-u");
-        pilhaInFixa.add("a");
-        pilhaInFixa.add("+");
-        pilhaInFixa.add("b");
-        pilhaInFixa.add(")");
-        pilhaInFixa.add("-");
-        pilhaInFixa.add("45");
-        pilhaInFixa.add(")");
-        pilhaInFixa.add("*");
-        pilhaInFixa.add("c");
-        pilhaInFixa.add("*");
-        pilhaInFixa.add("10");
-
-        return pilhaInFixa;
-    }
 }

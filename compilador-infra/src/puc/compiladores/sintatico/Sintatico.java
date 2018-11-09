@@ -4,6 +4,7 @@ import puc.compiladores.lexico.Lexico;
 import puc.compiladores.lexico.LexicoException;
 import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
+import puc.compiladores.posfixa.ConversorPosfixa;
 import puc.compiladores.semantico.*;
 
 import javax.swing.*;
@@ -24,6 +25,8 @@ public class Sintatico {
 	private String lexemaEscopo;
 	private String lexemaEscopoAux;
 	private ArrayList<String> arrayExpressao;
+	private ArrayList<String> arrayPosfixa;
+	private ConversorPosfixa conversorPosfixa;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         simboloVariavelArrayList = new ArrayList<>();
@@ -267,7 +270,7 @@ public class Sintatico {
 		arrayExpressao = new ArrayList<>();
 		analisaExpressao();
 		System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
-		printaExpressao();
+		printaExpressao(arrayExpressao);
 		arrayExpressao = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
 			tk = sintaticoBuscaToken();
@@ -282,7 +285,7 @@ public class Sintatico {
 		arrayExpressao = new ArrayList<>();
 		analisaExpressao();
 		System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
-		printaExpressao();
+		printaExpressao(arrayExpressao);
 		arrayExpressao = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
 			tk = sintaticoBuscaToken();
@@ -399,8 +402,8 @@ public class Sintatico {
 		}
 	}
 
-	private void printaExpressao() {
-		for (String valor : arrayExpressao) {
+	private void printaExpressao(ArrayList<String> array) {
+		for (String valor : array) {
 			System.out.println(valor);
 		}
 	}
@@ -487,11 +490,19 @@ public class Sintatico {
 
 	private void analisaAtribuicao() throws SintaticoException, LexicoException, SemanticoException {
         tk = sintaticoBuscaToken();
-
+		conversorPosfixa = new ConversorPosfixa();
 		arrayExpressao = new ArrayList<>();
         analisaExpressao();
+
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO:::");
-		printaExpressao();
+		printaExpressao(arrayExpressao);
+
+        arrayPosfixa = new ArrayList<>();
+        arrayPosfixa = conversorPosfixa.pilhaTratada(arrayExpressao);
+
+		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
+		printaExpressao(arrayPosfixa);
 		arrayExpressao = new ArrayList<>();
+		arrayPosfixa = new ArrayList<>();
 	}
 }
