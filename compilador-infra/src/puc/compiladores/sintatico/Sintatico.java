@@ -4,7 +4,7 @@ import puc.compiladores.lexico.Lexico;
 import puc.compiladores.lexico.LexicoException;
 import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
-import puc.compiladores.posfixa.ConversorPosfixa;
+import puc.compiladores.posfixa.Posfixa;
 import puc.compiladores.semantico.*;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class Sintatico {
 	private String lexemaEscopoAux;
 	private ArrayList<String> arrayExpressao;
 	private ArrayList<String> arrayPosfixa;
-	private ConversorPosfixa conversorPosfixa;
+	private Posfixa posfixa;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         simboloVariavelArrayList = new ArrayList<>();
@@ -490,7 +490,7 @@ public class Sintatico {
 
 	private void analisaAtribuicao() throws SintaticoException, LexicoException, SemanticoException {
         tk = sintaticoBuscaToken();
-		conversorPosfixa = new ConversorPosfixa();
+		posfixa = new Posfixa();
 		arrayExpressao = new ArrayList<>();
         analisaExpressao();
 
@@ -498,7 +498,7 @@ public class Sintatico {
 		printaExpressao(arrayExpressao);
 
         arrayPosfixa = new ArrayList<>();
-        arrayPosfixa = conversorPosfixa.pilhaTratada(arrayExpressao);
+        arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
 
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
 		printaExpressao(arrayPosfixa);
