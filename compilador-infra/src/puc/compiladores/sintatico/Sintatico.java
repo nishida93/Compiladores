@@ -5,6 +5,7 @@ import puc.compiladores.lexico.Lexico;
 import puc.compiladores.lexico.LexicoException;
 import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
+import puc.compiladores.posfixa.Posfixa;
 import puc.compiladores.semantico.*;
 
 import javax.swing.*;
@@ -31,6 +32,8 @@ public class Sintatico {
 	private ArrayList<String> arrayExpressaoTipos;
 	private int rotulo;
 	private int posicaoVariaveis;
+	private ArrayList<String> arrayPosfixa;
+	private Posfixa posfixa;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         simboloVariavelArrayList = new ArrayList<>();
@@ -122,6 +125,7 @@ public class Sintatico {
 	private void analisaVariaveis() throws SintaticoException, LexicoException, SemanticoException {
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
+				System.out.println("O identificador eh >>> " + tk.getLexema());
                 if (!semantico.existeDuplicidadeVariavel(tk.getLexema())) {
                     simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
                     semantico.insereTabelaSimbolos(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
@@ -292,7 +296,7 @@ public class Sintatico {
 		arrayExpressaoTipos = new ArrayList<>();
 		analisaExpressao();
 		System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
-		printaExpressao();
+		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO ENQUANTO:::");
 		printaExpressaoTipos();
 		arrayExpressao = new ArrayList<>();
@@ -316,7 +320,7 @@ public class Sintatico {
 		arrayExpressaoTipos = new ArrayList<>();
 		analisaExpressao();
 		System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
-		printaExpressao();
+		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO SE:::");
 		printaExpressaoTipos();
 		arrayExpressao = new ArrayList<>();
@@ -449,8 +453,8 @@ public class Sintatico {
 		}
 	}
 
-	private void printaExpressao() {
-		for (String valor : arrayExpressao) {
+	private void printaExpressao(ArrayList<String> array) {
+		for (String valor : array) {
 			System.out.println(valor);
 		}
 	}
@@ -552,15 +556,22 @@ public class Sintatico {
 
 	private void analisaAtribuicao() throws SintaticoException, LexicoException, SemanticoException {
         tk = sintaticoBuscaToken();
-
+		posfixa = new Posfixa();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
         analisaExpressao();
+
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO:::");
-		printaExpressao();
+		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO:::");
 		printaExpressaoTipos();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
+        arrayPosfixa = new ArrayList<>();
+        arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
+		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
+		printaExpressao(arrayPosfixa);
+		arrayExpressao = new ArrayList<>();
+		arrayPosfixa = new ArrayList<>();
 	}
 }
