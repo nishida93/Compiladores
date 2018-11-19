@@ -39,8 +39,8 @@ public class Posfixa {
                 aux = elemento;
             } else {
                 arrayPosfixa.add(elemento);
-                if(elemento.equals("+u") || elemento.equals("-u") ||
-                        elemento.equals("nao")){
+                if(aux.equals("+u") || aux.equals("-u") ||
+                        aux.equals("nao")){
                     arrayAux.add(aux);
                     aux = "";
                 }
