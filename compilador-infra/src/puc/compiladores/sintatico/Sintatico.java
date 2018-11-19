@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 public class Sintatico {
 
+	public static final String LABEL_CONSTANT = "L";
+
 	private int controle;
 	private Lexico lx;
 	private Semantico semantico;
@@ -27,6 +29,8 @@ public class Sintatico {
 	private String lexemaEscopoAux;
 	private ArrayList<String> arrayExpressao;
 	private ArrayList<String> arrayExpressaoTipos;
+	private int rotulo;
+	private int posicaoVariaveis;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         simboloVariavelArrayList = new ArrayList<>();
@@ -38,6 +42,8 @@ public class Sintatico {
 		geracaoCodigo = new GeracaoCodigo();
 		arrayExpressaoTipos = new ArrayList<>();
 		controle = 0;
+		rotulo = 1;
+		posicaoVariaveis = 0;
 
 		while (!lx.isFileOver(controle)) {
 			tk = sintaticoBuscaToken();
@@ -55,8 +61,6 @@ public class Sintatico {
 						}
 						tk = sintaticoBuscaToken();
 						if (previousTk.getSimbolo().equals(Simbolo.SPONTO.getName()) && tk == null) {
-                            //semantico.imprime();
-							System.out.println("SINTATICO EXECUTADO COM SUCESSO");
 							textAreaErro.setText("EXECUTADO COM SUCESSO");
 							textAreaErro.setForeground(Color.GREEN);
 							geracaoCodigo.generateHlt();
@@ -90,8 +94,11 @@ public class Sintatico {
 	private void analisaBloco() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		analisaEtVariaveis();
+		//semantico.printaVariaveis();
 		analisaSubRotinas();
+		//semantico.printaVariaveis();
 		analisaComandos();
+		//semantico.printaVariaveis();
 	}
 
 	private void analisaEtVariaveis() throws SintaticoException, LexicoException, SemanticoException {
@@ -116,8 +123,9 @@ public class Sintatico {
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
                 if (!semantico.existeDuplicidadeVariavel(tk.getLexema())) {
-                    simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", ""));
-                    semantico.insereTabelaSimbolos(new SimboloVariavel(tk.getLexema(), "", "", ""));
+                    simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
+                    semantico.insereTabelaSimbolos(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
+                    posicaoVariaveis++;
                     tk = sintaticoBuscaToken();
                     if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName()) || tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
                         if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName())) {
@@ -250,6 +258,8 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
 					if (semantico.isTipoInteiro(tk.getLexema())) {
+						geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk));
+						geracaoCodigo.generatePrn();
 						tk = sintaticoBuscaToken();
 						if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 							tk = sintaticoBuscaToken();
@@ -270,10 +280,13 @@ public class Sintatico {
 		}
 	}
 
+	// geracao done
 	private void analisaEnquanto() throws SintaticoException, LexicoException, SemanticoException {
-		int auxrot1 = 0, auxrot2 = 0;
+		int auxrot1 = 0,
+			auxrot2 = 0;
 		auxrot1 = geracaoCodigo.getRotulo();
-		geracaoCodigo.generateLabel();
+		geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
+		rotulo++;
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
@@ -285,11 +298,13 @@ public class Sintatico {
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
-			auxrot2 = geracaoCodigo.getRotulo();
+			auxrot2 = rotulo;
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
+			geracaoCodigo.generateJump("JMP", "L"+rotulo);
+			rotulo++;
 			geracaoCodigo.generateJump("JMP", "L"+auxrot1);
-			geracaoCodigo.generateLabel();
+			geracaoCodigo.generateLabel("L" + auxrot2);
 		} else {
 			throw SintaticoException.erroSintatico("[ANALISA ENQUANTO] Faltou a palavra 'faca'", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
@@ -319,10 +334,16 @@ public class Sintatico {
 	}
 
 	private void analisaSubRotinas() throws SintaticoException, LexicoException, SemanticoException {
-		// int flag = 0;
+		int auxrot = 0,
+			flag = 0;
+
 		if (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SFUNCAO.getName())) {
 			// implementacao da geracao
+			auxrot = rotulo;
+			geracaoCodigo.generateJump("JMP", LABEL_CONSTANT + rotulo);
+			rotulo++;
+			flag = 1;
 		}
 		while (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SFUNCAO.getName())) {
@@ -338,10 +359,14 @@ public class Sintatico {
 				throw SintaticoException.erroFaltandoPontoVirgula(tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		}
+
+		if(flag == 1)
+		{
+			geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot);
+		}
 	}
 
 	private void analisaDeclaracaoProcedimento() throws SintaticoException, LexicoException, SemanticoException {
-	    //String nivel = "L";
         tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 		    if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(tk.getLexema())) {
@@ -349,8 +374,9 @@ public class Sintatico {
 					lexemaEscopoAux = lexemaEscopo;
 				}
 		    	lexemaEscopo = tk.getLexema();
-				geracaoCodigo.generateLabel();
-                semantico.insereTabelaSimbolos(new SimboloProcedimento(tk.getLexema(), "", geracaoCodigo.geraRotulo()));
+                semantico.insereTabelaSimbolos(new SimboloProcedimento(tk.getLexema(), "", LABEL_CONSTANT + rotulo));
+				geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
+				rotulo++;
                 tk = sintaticoBuscaToken();
                 if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
                     analisaBloco();
@@ -371,8 +397,9 @@ public class Sintatico {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
             if (!semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
                 temp = tk;
-				geracaoCodigo.generateLabel();
-                semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", geracaoCodigo.geraRotulo()));
+				geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
+                semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", LABEL_CONSTANT + rotulo));
+				rotulo++;
 				if (lexemaEscopo != null) { // para nao perder procedimentos dentro de outros procedimentos
 					lexemaEscopoAux = lexemaEscopo;
 				}
@@ -416,7 +443,7 @@ public class Sintatico {
 				tk.getSimbolo().equals(Simbolo.SMENORIG.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SDIF.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(tk.getLexema());
 			tk = sintaticoBuscaToken();
 			analisaExpressaoSimples();
 		}
@@ -440,7 +467,7 @@ public class Sintatico {
 				tk.getSimbolo().equals(Simbolo.SMENOS.getName())) {
 			// add
 			arrayExpressao.add(tk.getLexema() + "u");
-			arrayExpressaoTipos.add(tk.getSimbolo() + "u");
+			arrayExpressaoTipos.add(tk.getLexema() + "u");
             tk = sintaticoBuscaToken();
         }
         analisaTermo();
@@ -448,7 +475,7 @@ public class Sintatico {
                 tk.getSimbolo().equals(Simbolo.SMENOS.getName()) ||
                 tk.getSimbolo().equals(Simbolo.SOU.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(tk.getLexema());
             tk = sintaticoBuscaToken();
             analisaTermo();
         }
@@ -461,7 +488,7 @@ public class Sintatico {
 				tk.getSimbolo().equals(Simbolo.SDIV.getName()) ||
 				tk.getSimbolo().equals(Simbolo.SE.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(tk.getLexema());
 			tk = sintaticoBuscaToken();
 			analisaFator();
 		}
@@ -470,7 +497,7 @@ public class Sintatico {
 	private void analisaFator() throws SintaticoException, LexicoException, SemanticoException {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(semantico.pegaTipoVariavel(tk.getLexema()));
 			if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) { // eh uma funcao
 				analisaChamadaFuncao();
 			} else if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
@@ -480,21 +507,21 @@ public class Sintatico {
 			}
 		} else if (tk.getSimbolo().equals(Simbolo.SNUMERO.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(tk.getLexema());
 			tk = sintaticoBuscaToken();
 		} else if (tk.getSimbolo().equals(Simbolo.SNAO.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(tk.getLexema());
 			tk = sintaticoBuscaToken();
 			analisaFator();
 		} else if (tk.getSimbolo().equals(Simbolo.SABREPARENTESES.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(tk.getSimbolo());
+			arrayExpressaoTipos.add(tk.getLexema());
 			tk = sintaticoBuscaToken();
 			analisaExpressao();
 			if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 				arrayExpressao.add(tk.getLexema());
-				arrayExpressaoTipos.add(tk.getSimbolo());
+				arrayExpressaoTipos.add(tk.getLexema());
 				tk = sintaticoBuscaToken();
 			} else {
 				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -509,6 +536,7 @@ public class Sintatico {
 
 	private void analisaChamadaFuncao() throws LexicoException, SemanticoException {
 		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
+			geracaoCodigo.generateCall(semantico.buscaRotuloFuncao(tk.getLexema()));
 			tk = sintaticoBuscaToken();
 		} else {
 			throw SemanticoException.erroSemantico("Chamada de funcao invalida, pois funcao nao existe", tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -519,6 +547,7 @@ public class Sintatico {
 		if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(token.getLexema())) {
 			throw SemanticoException.erroSemantico("Chamada de procedimento invalida, pois procedimento nao existe", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
+		geracaoCodigo.generateCall(semantico.buscaRotuloProcedimento(token.getLexema()));
 	}
 
 	private void analisaAtribuicao() throws SintaticoException, LexicoException, SemanticoException {

@@ -3,6 +3,8 @@ package puc.compiladores.semantico;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import puc.compiladores.lexico.Token;
+
 public class TabelaSimbolos {
 
     private ArrayList<Simbolo> pilha;
@@ -116,5 +118,49 @@ public class TabelaSimbolos {
             }
         }
         return false;
+    }
+
+    public void printaVariaveis() {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo instanceof SimboloVariavel) {
+                System.out.println("PRINT VARIAVEL >>> " + simbolo.toString());
+            }
+        }
+    }
+
+    public String buscaPosicaoSimbolo(final Token tk) {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo instanceof SimboloVariavel && simbolo.getLexema().equals(tk.getLexema())) {
+                return String.valueOf(((SimboloVariavel) simbolo).getPosicao());
+            }
+        }
+        return null;
+    }
+
+    public String buscaRotuloProcedimento(final String lexema) {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo instanceof SimboloProcedimento && simbolo.getLexema().equals(lexema)) {
+                return String.valueOf(simbolo.getRotulo());
+            }
+        }
+        return null;
+    }
+
+    public String buscaRotuloFuncao(final String lexema) {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo instanceof SimboloFuncao && simbolo.getLexema().equals(lexema)) {
+                return String.valueOf(simbolo.getRotulo());
+            }
+        }
+        return null;
+    }
+
+    public String pegaTipoVariavel(final String lexema) {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo instanceof SimboloVariavel && simbolo.getLexema().equals(lexema)) {
+                return String.valueOf(((SimboloVariavel) simbolo).getTipoVariavel());
+            }
+        }
+        return null;
     }
 }

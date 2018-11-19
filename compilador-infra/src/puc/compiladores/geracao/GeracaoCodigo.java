@@ -38,17 +38,17 @@ public class GeracaoCodigo {
 		fileWriter.println("HLT");
 	}
 
-	public void generateLabel() {
-		fileWriter.println("L" + rotulo +": NULL");
+	public void generateLabel(final String rot) {
+		fileWriter.println(rot +": NULL");
 	}
 
 	public void generateJump(String jump, String rotulo) {
 		fileWriter.println(jump + " " + rotulo);
 	}
 
-	public void generateCall(String comando, String label)
+	public void generateCall(String label)
 	{
-		fileWriter.println(comando+label);
+		fileWriter.println("CALL " + label);
 	}
 
 	public void generateAlloc(String comando, String numeros)
@@ -72,5 +72,13 @@ public class GeracaoCodigo {
 
 	public String pegaRotulo() {
 		return "L" + rotulo;
+	}
+
+	public void generateLdv(final String buscaPosicaoSimbolo) {
+		fileWriter.println("LDV " + buscaPosicaoSimbolo);
+	}
+
+	public void generatePrn() {
+		fileWriter.println("PRN");
 	}
 }

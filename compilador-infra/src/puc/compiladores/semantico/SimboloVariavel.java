@@ -6,12 +6,13 @@ public class SimboloVariavel extends Simbolo {
      * inteiro
      * booleano
      */
-    public String tipoVariavel;
+    private String tipoVariavel;
+    private Integer posicao;
 
-
-    public SimboloVariavel(String lexema, String nivel, String rotulo, String tipoVariavel) {
+    public SimboloVariavel(String lexema, String nivel, String rotulo, String tipoVariavel, Integer posicao) {
         super(lexema, nivel, rotulo);
         this.tipoVariavel = tipoVariavel;
+        this.posicao = posicao;
     }
 
     public String getTipoVariavel() {
@@ -22,10 +23,16 @@ public class SimboloVariavel extends Simbolo {
         this.tipoVariavel = tipoVariavel;
     }
 
+    public Integer getPosicao() {
+        return posicao;
+    }
+
+    public void setPosicao(final Integer posicao) {
+        this.posicao = posicao;
+    }
+
     @Override
     public String toString() {
-        return super.toString() + ", SimboloVariavel{" +
-                "tipoVariavel='" + tipoVariavel + '\'' +
-                '}';
+        return "SimboloVariavel{" + "tipoVariavel='" + tipoVariavel + '\'' + ", posicao=" + posicao + "} " + super.toString();
     }
 }

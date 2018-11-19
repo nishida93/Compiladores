@@ -1,5 +1,7 @@
 package puc.compiladores.semantico;
 
+import puc.compiladores.lexico.Token;
+
 public class Semantico {
 
     TabelaSimbolos tabelaSimbolos;
@@ -97,5 +99,25 @@ public class Semantico {
 
     public boolean isTipoInteiro(final String lexema) {
         return tabelaSimbolos.verificaSeTipoInteiro(lexema);
+    }
+
+    public void printaVariaveis() {
+        tabelaSimbolos.printaVariaveis();
+    }
+
+    public String buscaPosicaoSimbolo(final Token tk) {
+        return tabelaSimbolos.buscaPosicaoSimbolo(tk);
+    }
+
+    public String buscaRotuloProcedimento(final String lexema) {
+        return tabelaSimbolos.buscaRotuloProcedimento(lexema);
+    }
+
+    public String buscaRotuloFuncao(final String lexema) {
+        return tabelaSimbolos.buscaRotuloFuncao(lexema);
+    }
+
+    public String pegaTipoVariavel(final String lexema) {
+        return tabelaSimbolos.pegaTipoVariavel(lexema);
     }
 }

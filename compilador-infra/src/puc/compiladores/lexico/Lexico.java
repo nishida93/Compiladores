@@ -61,9 +61,12 @@ public class Lexico {
             else if(characterArrayList.get(controle).toString().equals("{") ||
                     characterArrayList.get(controle).toString().equals("}"))
             {
-                while(!characterArrayList.get(controle).toString().equals("}"))
-                {
-
+                while(!characterArrayList.get(controle).toString().equals("}")) {
+                    if(characterArrayList.get(controle).toString().equals("\n"))
+                    {
+                        System.out.println("Quebrou linha");
+                        linha++;
+                    }
                     controle++;
                 }
                 try {
@@ -73,7 +76,6 @@ public class Lexico {
                 } catch (IndexOutOfBoundsException e) {
 
                 }
-                controle++;
             }
             else if(Character.isDigit(characterArrayList.get(controle)))
             {
