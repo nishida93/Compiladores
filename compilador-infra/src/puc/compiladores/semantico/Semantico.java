@@ -2,6 +2,8 @@ package puc.compiladores.semantico;
 
 import puc.compiladores.lexico.Token;
 
+import java.util.ArrayList;
+
 public class Semantico {
 
     TabelaSimbolos tabelaSimbolos;
@@ -20,7 +22,7 @@ public class Semantico {
     }
 
     public boolean existeDuplicidadeVariavel(final String lexema) {
-        return tabelaSimbolos.verificaDuplicidade(lexema);
+        return tabelaSimbolos.existeVariavel(lexema);
     }
     /**
      * Pesquisa declaracao de variavel na tabela de simbolos
@@ -119,5 +121,19 @@ public class Semantico {
 
     public String pegaTipoVariavel(final String lexema) {
         return tabelaSimbolos.pegaTipoVariavel(lexema);
+    }
+
+    /**
+     *
+     *
+     * @param expressao
+     * @return
+     */
+    public Integer validaRetornoExpressao(final ArrayList expressao) {
+        return 0;
+    }
+
+    public String pegaTipoFuncao(String lexema) {
+        return tabelaSimbolos.pegaTipoFuncao(lexema);
     }
 }

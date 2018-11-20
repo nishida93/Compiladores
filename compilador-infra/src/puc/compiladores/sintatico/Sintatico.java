@@ -501,10 +501,11 @@ public class Sintatico {
 	private void analisaFator() throws SintaticoException, LexicoException, SemanticoException {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 			arrayExpressao.add(tk.getLexema());
-			arrayExpressaoTipos.add(semantico.pegaTipoVariavel(tk.getLexema()));
 			if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) { // eh uma funcao
+				arrayExpressaoTipos.add(semantico.pegaTipoFuncao(tk.getLexema()));
 				analisaChamadaFuncao();
 			} else if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+				arrayExpressaoTipos.add(semantico.pegaTipoVariavel(tk.getLexema()));
 				tk = sintaticoBuscaToken();
 			} else {
 				throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -564,14 +565,14 @@ public class Sintatico {
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO:::");
 		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO:::");
-		printaExpressaoTipos();
-		arrayExpressao = new ArrayList<>();
-		arrayExpressaoTipos = new ArrayList<>();
-        arrayPosfixa = new ArrayList<>();
-        arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
+		printaExpressao(arrayExpressaoTipos);
+		//printaExpressaoTipos();
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
-		printaExpressao(arrayPosfixa);
+		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
+		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
+		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
 		arrayExpressao = new ArrayList<>();
+		arrayPosfixa = new ArrayList<>();
 		arrayPosfixa = new ArrayList<>();
 	}
 }

@@ -87,7 +87,9 @@ public class TabelaSimbolos {
 				pilha) {
 			if (simbolo.getLexema().equals(lexema) && simbolo instanceof SimboloVariavel) {
 				((SimboloVariavel) simbolo).setTipoVariavel(tipo);
-			}
+			} else if (simbolo.getLexema().equals(lexema) && simbolo instanceof SimboloFuncao) {
+                ((SimboloFuncao) simbolo).setTipoFuncao(tipo);
+            }
 		}
 	}
 
@@ -159,6 +161,15 @@ public class TabelaSimbolos {
         for (Simbolo simbolo : pilha) {
             if (simbolo instanceof SimboloVariavel && simbolo.getLexema().equals(lexema)) {
                 return String.valueOf(((SimboloVariavel) simbolo).getTipoVariavel());
+            }
+        }
+        return null;
+    }
+
+    public String pegaTipoFuncao(String lexema) {
+        for (Simbolo simbolo : pilha) {
+            if (simbolo instanceof SimboloFuncao && simbolo.getLexema().equals(lexema)) {
+                return String.valueOf((((SimboloFuncao) simbolo).getTipoFuncao()));
             }
         }
         return null;
