@@ -4,18 +4,19 @@ import java.util.ArrayList;
 
 public class Posfixa {
 
-    private ArrayList<String> arrayInfixa = new ArrayList<>();
-    private ArrayList<String> arrayPosfixa = new ArrayList<>();
-    private ArrayList<String> arrayAux = new ArrayList<>();
+    private ArrayList<String> arrayInfixa;
+    private ArrayList<String> arrayPosfixa;
+    private ArrayList<String> arrayAux;
 
-    public Posfixa() { }
+    public Posfixa() {
+        arrayInfixa = new ArrayList<>();
+        arrayAux = new ArrayList<>();
+        arrayPosfixa = new ArrayList<>();
+    }
 
     public ArrayList<String> trataPofixa(ArrayList<String> arrayExpressao) {
-
         arrayInfixa = arrayExpressao;
-
         trataPilha();
-
         return arrayPosfixa;
     }
 

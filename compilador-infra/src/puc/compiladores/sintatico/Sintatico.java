@@ -298,7 +298,7 @@ public class Sintatico {
 		System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
 		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO ENQUANTO:::");
-		printaExpressaoTipos();
+		printaExpressao(arrayExpressaoTipos);
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
@@ -322,7 +322,7 @@ public class Sintatico {
 		System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
 		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO SE:::");
-		printaExpressaoTipos();
+		printaExpressao(arrayExpressaoTipos);
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
@@ -459,12 +459,6 @@ public class Sintatico {
 		}
 	}
 
-	private void printaExpressaoTipos() {
-		for (String valor : arrayExpressaoTipos) {
-			System.out.println(valor);
-		}
-	}
-
 	private void analisaExpressaoSimples() throws SintaticoException, LexicoException, SemanticoException {
 		// Unario
 		if (tk.getSimbolo().equals(Simbolo.SMAIS.getName()) ||
@@ -566,13 +560,15 @@ public class Sintatico {
 		printaExpressao(arrayExpressao);
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO:::");
 		printaExpressao(arrayExpressaoTipos);
-		//printaExpressaoTipos();
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
-		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
+		posfixa = new Posfixa();
+		printaExpressao(arrayPosfixa);
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
+		printaExpressao(arrayPosfixa);
 		arrayExpressao = new ArrayList<>();
 		arrayPosfixa = new ArrayList<>();
-		arrayPosfixa = new ArrayList<>();
+
 	}
 }
