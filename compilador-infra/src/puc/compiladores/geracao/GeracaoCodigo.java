@@ -39,7 +39,7 @@ public class GeracaoCodigo {
 	}
 
 	public void generateLabel(final String rot) {
-		fileWriter.println(rot +": NULL");
+		fileWriter.println(rot +" NULL");
 	}
 
 	public void generateJump(String jump, String rotulo) {

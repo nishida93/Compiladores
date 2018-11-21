@@ -42,7 +42,7 @@ public class Posfixa {
                 arrayPosfixa.add(elemento);
                 if(aux.equals("+u") || aux.equals("-u") ||
                         aux.equals("nao")){
-                    arrayAux.add(aux);
+                    arrayPosfixa.add(aux);
                     aux = "";
                 }
             }
