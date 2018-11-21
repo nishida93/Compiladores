@@ -44,22 +44,6 @@ public class TabelaSimbolos {
         return false;
     }
 
-    public void imprime() {
-        for (Simbolo valor:
-             pilha) {
-            if (valor instanceof SimboloPrograma) {
-                System.out.println("Simbolo programa");
-            } else if (valor instanceof SimboloProcedimento) {
-                System.out.println("Simbolo procedimento");
-            } else if (valor instanceof SimboloFuncao) {
-                System.out.println("Simbolo funcao");
-            } else if (valor instanceof SimboloVariavel) {
-                System.out.println("Simbolo variavel");
-            }
-            System.out.println("VALORES NA PILHA >>> " + valor.toString());
-        }
-    }
-
     public boolean existeFuncao(final String lexema) {
         for (Simbolo simbolo :
                 pilha) {
@@ -108,7 +92,6 @@ public class TabelaSimbolos {
         }
         pilha.removeAll(tmpToRemove);
         Collections.reverse(pilha);
-        imprime();
     }
 
     public boolean verificaSeTipoInteiro(final String lexema) {

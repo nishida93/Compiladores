@@ -28,7 +28,7 @@ public class Posfixa {
                     elemento.equals("+") || elemento.equals("-") ||
                     elemento.equals(">") || elemento.equals("<") ||
                     elemento.equals(">=") || elemento.equals("<=") ||
-                    elemento.equals("=") || elemento.equals("!") ||
+                    elemento.equals("=") || elemento.equals("!=") ||
                     elemento.equals("e") || elemento.equals("ou")) {
                 trataElemento(elemento);
             } else if (elemento.equals("(")) {

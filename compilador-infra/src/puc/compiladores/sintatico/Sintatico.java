@@ -97,11 +97,8 @@ public class Sintatico {
 	private void analisaBloco() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
 		analisaEtVariaveis();
-		//semantico.printaVariaveis();
 		analisaSubRotinas();
-		//semantico.printaVariaveis();
 		analisaComandos();
-		//semantico.printaVariaveis();
 	}
 
 	private void analisaEtVariaveis() throws SintaticoException, LexicoException, SemanticoException {
@@ -222,7 +219,7 @@ public class Sintatico {
 		Token token = tk;
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SATRIBUICAO.getName())) {
-			analisaAtribuicao();
+			analisaAtribuicao(token);
 		} else {
 			analisaChamadaProcedimento(token);
 		}
@@ -294,13 +291,30 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
-		analisaExpressao();
+		arrayPosfixa = new ArrayList<>();
+		posfixa = new Posfixa();
+		analisaExpressao(); // deve retornar um booleano
+
 		System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
 		printaExpressao(arrayExpressao);
+
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO ENQUANTO:::");
 		printaExpressao(arrayExpressaoTipos);
+
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ENQUANTO POSFIXA:::");
+		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
+		printaExpressao(arrayPosfixa);
+		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 0) {
+			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha(), textAreaErro, textAreaCodigo);
+		}
+
+
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
+		arrayPosfixa = new ArrayList<>();
+		posfixa = new Posfixa();
+
+
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
 			auxrot2 = rotulo;
 			tk = sintaticoBuscaToken();
@@ -318,13 +332,36 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
-		analisaExpressao();
+		posfixa = new Posfixa();
+		analisaExpressao(); // deve retornar booleano
+
+
+
 		System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
 		printaExpressao(arrayExpressao);
+
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO SE:::");
 		printaExpressao(arrayExpressaoTipos);
+
+		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
+		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
+		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
+		printaExpressao(arrayPosfixa);
+
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA SE POSFIXA:::");
+		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
+		printaExpressao(arrayPosfixa);
+		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 1) {
+			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha(), textAreaErro, textAreaCodigo);
+		}
+
+
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
+		arrayPosfixa = new ArrayList<>();
+		posfixa = new Posfixa();
+
+
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
@@ -549,12 +586,15 @@ public class Sintatico {
 		geracaoCodigo.generateCall(semantico.buscaRotuloProcedimento(token.getLexema()));
 	}
 
-	private void analisaAtribuicao() throws SintaticoException, LexicoException, SemanticoException {
+	private void analisaAtribuicao(final Token tokenVariavel) throws SintaticoException, LexicoException, SemanticoException {
+		System.out.println("O TOKEN PARA ATRIBUICAO EHHH:" + tokenVariavel.toString());
+		System.out.println(semantico.pegaTipoVariavel(tokenVariavel.getLexema()));
         tk = sintaticoBuscaToken();
-		posfixa = new Posfixa();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
-        analisaExpressao();
+		arrayPosfixa = new ArrayList<>();
+		posfixa = new Posfixa();
+        analisaExpressao(); // deve retornar tipo compativel com a variavel
 
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO:::");
 		printaExpressao(arrayExpressao);
@@ -562,13 +602,26 @@ public class Sintatico {
 		printaExpressao(arrayExpressaoTipos);
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
-		posfixa = new Posfixa();
+		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
 		printaExpressao(arrayPosfixa);
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
 		printaExpressao(arrayPosfixa);
+
+		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()).equals("booleano")) {
+			if(semantico.validaRetornoExpressao(arrayPosfixa, tokenVariavel.getLinha(), textAreaErro, textAreaCodigo) != 0) {
+				throw SemanticoException.erroSemantico("Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
+			}
+		} else {
+			if(semantico.validaRetornoExpressao(arrayPosfixa, tokenVariavel.getLinha(), textAreaErro, textAreaCodigo) != 1) {
+				throw SemanticoException.erroSemantico("Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
+			}
+		}
+
 		arrayExpressao = new ArrayList<>();
+		arrayExpressaoTipos = new ArrayList<>();
 		arrayPosfixa = new ArrayList<>();
+		posfixa = new Posfixa();
 
 	}
 }
