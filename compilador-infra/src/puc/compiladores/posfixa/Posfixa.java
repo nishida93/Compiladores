@@ -89,7 +89,7 @@ public class Posfixa {
         for (i = arrayAux.size() - 1; i >= 0; i--) {
             if(arrayAux.get(i).equals("(")) {
                 break;
-            }else if(pegaPrioridade(arrayAux.get(i)) <= pegaPrioridade(expressao)) {
+            }else if(pegaPrioridade(arrayAux.get(i)) >= pegaPrioridade(expressao)) {
                 arrayPosfixa.add(arrayAux.get(i));
                 arrayAux.remove(i);
                 break;
