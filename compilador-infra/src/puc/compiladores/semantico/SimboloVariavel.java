@@ -15,6 +15,12 @@ public class SimboloVariavel extends Simbolo {
         this.posicao = posicao;
     }
 
+    public SimboloVariavel(final String simboloVariavelLexema, final String lexema, final int posicaoVariaveis) {
+        super(simboloVariavelLexema, "", "");
+        this.tipoVariavel = lexema;
+        this.posicao = posicaoVariaveis;
+    }
+
     public String getTipoVariavel() {
         return tipoVariavel;
     }

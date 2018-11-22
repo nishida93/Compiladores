@@ -3,6 +3,7 @@ package puc.compiladores.sintatico;
 import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.swing.JTextArea;
 
@@ -25,13 +26,12 @@ public class Sintatico {
 
 	private int controle;
 	private Lexico lx;
-	private Semantico semantico;
-	private GeracaoCodigo geracaoCodigo;
+	private Semantico semantico = new Semantico();
+	private GeracaoCodigo geracaoCodigo = new GeracaoCodigo();
 	private Token tk;
 	private Token previousTk;
 	private JTextArea textAreaErro;
 	private JTextArea textAreaCodigo;
-	private ArrayList<SimboloVariavel> simboloVariavelArrayList;
 	private String lexemaEscopo;
 	private String lexemaEscopoAux;
 	private ArrayList<String> arrayExpressao;
@@ -40,25 +40,18 @@ public class Sintatico {
 	private int posicaoVariaveis;
 	private ArrayList<String> arrayPosfixa;
 	private Posfixa posfixa;
-	private String nomeDaFuncao;
-	private boolean flagFuncao;
-	private boolean flagFuncaoAtribuicao;
+	private Stack<Scope> pilhaEscopos = new Stack<>();
+	private int controleAllocs = 0;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
-        simboloVariavelArrayList = new ArrayList<>();
 		textAreaError.setText("");
 	    textAreaErro = textAreaError;
 	    textAreaCodigo = textAreaCod;
 		lx = new Lexico(arquivo, textAreaErro, textAreaCodigo);
-		semantico = new Semantico();
-		geracaoCodigo = new GeracaoCodigo();
 		arrayExpressaoTipos = new ArrayList<>();
 		controle = 0;
 		rotulo = 1;
 		posicaoVariaveis = 0;
-		flagFuncao = false;
-		flagFuncaoAtribuicao = false;
-		nomeDaFuncao = "";
 
 		while (!lx.isFileOver(controle)) {
 			tk = sintaticoBuscaToken();
@@ -66,6 +59,7 @@ public class Sintatico {
 				tk = sintaticoBuscaToken();
 				if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 				    semantico.insereTabelaSimbolos(new SimboloPrograma(tk.getLexema(),"",""));
+				    pilhaEscopos.push(Scope.createProgramScope());
 				    geracaoCodigo.generateFile(tk.getLexema());
 				    geracaoCodigo.generateStart();
 					tk = sintaticoBuscaToken();
@@ -135,12 +129,13 @@ public class Sintatico {
 	}
 
 	private void analisaVariaveis() throws SintaticoException, LexicoException, SemanticoException {
+		ArrayList<SimboloVariavel> simboloVariavelArrayList = new ArrayList<>();
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-				System.out.println("O identificador eh >>> " + tk.getLexema());
+				//System.out.println("O identificador eh >>> " + tk.getLexema());
                 if (!semantico.existeDuplicidadeVariavel(tk.getLexema())) {
                     simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
-                    semantico.insereTabelaSimbolos(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
+
                     posicaoVariaveis++;
                     tk = sintaticoBuscaToken();
                     if (tk.getSimbolo().equals(Simbolo.SVIRGULA.getName()) || tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
@@ -161,20 +156,20 @@ public class Sintatico {
 			}
 		}
 		tk = sintaticoBuscaToken();
-		analisaTipo();
+		analisaTipo(simboloVariavelArrayList);
 	}
 
-	private void analisaTipo() throws SintaticoException, LexicoException {
+	private void analisaTipo(ArrayList<SimboloVariavel> simboloVariavelArrayList) throws SintaticoException, LexicoException {
 		if (!tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) && !tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
 			throw SintaticoException.erroSintatico("Tipo de variavel invalido", tk.getLinha(), textAreaErro, textAreaCodigo);
 		} else {
             for (SimboloVariavel simboloVariavel:
                  simboloVariavelArrayList) {
-                //System.out.println("Colocando tipo na variavel " + simboloVariavel.getLexema() + " e o tipo é " + tk.getSimbolo());
-                semantico.colocaTipoTabela(simboloVariavel.getLexema(), tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) ? "inteiro" : "booleano");
-                //semantico.imprime();
+				System.out.println("Inserindo variavel: " + simboloVariavel.getLexema());
+				semantico.insereTabelaSimbolos(new SimboloVariavel(simboloVariavel.getLexema(), tk.getLexema(), posicaoVariaveis));
+				geracaoCodigo.geraAlloc(controleAllocs);
+				controleAllocs++;
             }
-            simboloVariavelArrayList = new ArrayList<>();
 			tk = sintaticoBuscaToken();
 		}
 	}
@@ -193,25 +188,19 @@ public class Sintatico {
 					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			}
-			// System.out.println("Finalizando func/proc " + lexemaEscopo);
-			// TODO para gerar o RETURNF
-			/*if (flagFuncao && semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(nomeDaFuncao) && lexemaEscopo != null) {
-				System.out.println("Finalizando a funcao na linha " + tk.getLinha() + " com a funcao: " + nomeDaFuncao);
-				flagFuncao= false;
-				nomeDaFuncao = "";
-				if (!flagFuncaoAtribuicao) {
-					throw SemanticoException.erroSemantico("Faltou declarar retorno da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
-				}
-			}*/
-			if (lexemaEscopo != null) {
-				System.out.println("Desempilhando ate > " + lexemaEscopo);
-				semantico.desempilhaSimbolos(lexemaEscopo);
-				lexemaEscopo = null;
-			} else if (lexemaEscopoAux != null) {
-				System.out.println("Desempilhando ate > " + lexemaEscopoAux);
-				semantico.desempilhaSimbolos(lexemaEscopoAux);
-				lexemaEscopoAux = null;
+			System.out.println("Finalizando func/proc " + lexemaEscopo);
+
+			final Scope scope = pilhaEscopos.pop();
+			if (scope.isProgram()) {
+				System.out.println("FINALIZANDO PROGRAMA:::" + scope.getName());
+			} else if (scope.isFunction()) {
+				// TODO implementar o RETURNF
+				System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
+			} else if (scope.isProcedure()) {
+				// TODO implementar o RETURN
+				System.out.println("FINALIZANDO PROCEDURE:::" + scope.getName());
 			}
+
 			tk = sintaticoBuscaToken();
 		} else {
 			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -414,7 +403,6 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName())) {
 				analisaDeclaracaoProcedimento();
 			} else {
-				flagFuncao = true;
 				analisaDeclaracaoFuncao();
 			}
 
@@ -435,6 +423,7 @@ public class Sintatico {
         tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 		    if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(tk.getLexema())) {
+				pilhaEscopos.push(Scope.createProcedureScope(tk.getLexema()));
 				if (lexemaEscopo != null) { // para nao perder procedimentos dentro de outros procedimentos
 					lexemaEscopoAux = lexemaEscopo;
 				}
@@ -461,7 +450,7 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
             if (!semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
-            	nomeDaFuncao = tk.getLexema();
+				pilhaEscopos.push(Scope.createFunctionScope(tk.getLexema()));
                 temp = tk;
 				geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
                 semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", LABEL_CONSTANT + rotulo));
@@ -639,11 +628,11 @@ public class Sintatico {
 		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()) == null && !semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema())) {
 			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 		}
-
-		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(nomeDaFuncao) && flagFuncao) {
+		// TODO validar se tem atribuicao com o nome da funcao
+		/*if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(nomeDaFuncao) && flagFuncao) {
 			System.out.println("Atribuicao para funcao, ou seja, retorno declarado");
 			flagFuncaoAtribuicao = true;
-		}
+		}*/
 
 		if ("booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema())) || "booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema()))) {
 			if(semantico.validaRetornoExpressao(arrayPosfixa, tokenVariavel.getLinha(), textAreaErro, textAreaCodigo) != 0) {

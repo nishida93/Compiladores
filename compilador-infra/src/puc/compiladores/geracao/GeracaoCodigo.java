@@ -81,4 +81,8 @@ public class GeracaoCodigo {
 	public void generatePrn() {
 		fileWriter.println("PRN");
 	}
+
+	public void geraAlloc(final int controle) {
+		fileWriter.println("ALLOC " + controle + ",1");
+	}
 }
