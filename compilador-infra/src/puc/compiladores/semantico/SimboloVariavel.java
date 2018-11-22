@@ -7,7 +7,7 @@ public class SimboloVariavel extends Simbolo {
      * booleano
      */
     private String tipoVariavel;
-    private Integer posicao;
+    private Integer posicao; // para LDVs
 
     public SimboloVariavel(String lexema, String nivel, String rotulo, String tipoVariavel, Integer posicao) {
         super(lexema, nivel, rotulo);

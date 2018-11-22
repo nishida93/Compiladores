@@ -342,6 +342,12 @@ public class Lexico {
             case "nao":
                 t.setSimbolo(Simbolo.SNAO.getName());
                 break;
+            case "verdadeiro":
+                t.setSimbolo(Simbolo.SVERDADEIRO.getName());
+                break;
+            case "falso":
+                t.setSimbolo(Simbolo.SFALSO.getName());
+                break;
             default:
                 t.setSimbolo(Simbolo.SIDENTIFICADOR.getName());
                 break;

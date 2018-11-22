@@ -1,21 +1,27 @@
 package puc.compiladores.sintatico;
 
+import java.awt.Color;
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.JTextArea;
+
 import puc.compiladores.geracao.GeracaoCodigo;
 import puc.compiladores.lexico.Lexico;
 import puc.compiladores.lexico.LexicoException;
 import puc.compiladores.lexico.Simbolo;
 import puc.compiladores.lexico.Token;
 import puc.compiladores.posfixa.Posfixa;
-import puc.compiladores.semantico.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.util.ArrayList;
+import puc.compiladores.semantico.Semantico;
+import puc.compiladores.semantico.SemanticoException;
+import puc.compiladores.semantico.SimboloFuncao;
+import puc.compiladores.semantico.SimboloProcedimento;
+import puc.compiladores.semantico.SimboloPrograma;
+import puc.compiladores.semantico.SimboloVariavel;
 
 public class Sintatico {
 
-	public static final String LABEL_CONSTANT = "L";
+	private static final String LABEL_CONSTANT = "L";
 
 	private int controle;
 	private Lexico lx;
@@ -34,6 +40,9 @@ public class Sintatico {
 	private int posicaoVariaveis;
 	private ArrayList<String> arrayPosfixa;
 	private Posfixa posfixa;
+	private String nomeDaFuncao;
+	private boolean flagFuncao;
+	private boolean flagFuncaoAtribuicao;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
         simboloVariavelArrayList = new ArrayList<>();
@@ -47,6 +56,9 @@ public class Sintatico {
 		controle = 0;
 		rotulo = 1;
 		posicaoVariaveis = 0;
+		flagFuncao = false;
+		flagFuncaoAtribuicao = false;
+		nomeDaFuncao = "";
 
 		while (!lx.isFileOver(controle)) {
 			tk = sintaticoBuscaToken();
@@ -96,7 +108,10 @@ public class Sintatico {
 
 	private void analisaBloco() throws SintaticoException, LexicoException, SemanticoException {
 		tk = sintaticoBuscaToken();
+
 		analisaEtVariaveis();
+		System.out.println("Quantidade de variaveis declaradas::: " + posicaoVariaveis);
+
 		analisaSubRotinas();
 		analisaComandos();
 	}
@@ -179,12 +194,20 @@ public class Sintatico {
 				}
 			}
 			// System.out.println("Finalizando func/proc " + lexemaEscopo);
+			// TODO para gerar o RETURNF
+			/*if (flagFuncao && semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(nomeDaFuncao) && lexemaEscopo != null) {
+				System.out.println("Finalizando a funcao na linha " + tk.getLinha() + " com a funcao: " + nomeDaFuncao);
+				flagFuncao= false;
+				nomeDaFuncao = "";
+				if (!flagFuncaoAtribuicao) {
+					throw SemanticoException.erroSemantico("Faltou declarar retorno da funcao", tk.getLinha(), textAreaErro, textAreaCodigo);
+				}
+			}*/
 			if (lexemaEscopo != null) {
 				System.out.println("Desempilhando ate > " + lexemaEscopo);
 				semantico.desempilhaSimbolos(lexemaEscopo);
 				lexemaEscopo = null;
-			}
-			if (lexemaEscopoAux != null) {
+			} else if (lexemaEscopoAux != null) {
 				System.out.println("Desempilhando ate > " + lexemaEscopoAux);
 				semantico.desempilhaSimbolos(lexemaEscopoAux);
 				lexemaEscopoAux = null;
@@ -257,8 +280,8 @@ public class Sintatico {
 		if (tk.getSimbolo().equals(Simbolo.SABREPARENTESES.getName())) {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
-					if (semantico.isTipoInteiro(tk.getLexema())) {
+				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema()) || semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
+					if (semantico.isTipoInteiro(tk.getLexema()) || semantico.pegaTipoFuncao(tk.getLexema()).equals("inteiro")) {
 						geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk));
 						geracaoCodigo.generatePrn();
 						tk = sintaticoBuscaToken();
@@ -295,17 +318,17 @@ public class Sintatico {
 		posfixa = new Posfixa();
 		analisaExpressao(); // deve retornar um booleano
 
-		System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
+		/*System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
 		printaExpressao(arrayExpressao);
 
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO ENQUANTO:::");
 		printaExpressao(arrayExpressaoTipos);
 
-		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ENQUANTO POSFIXA:::");
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ENQUANTO POSFIXA:::");*/
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
-		printaExpressao(arrayPosfixa);
-		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 0) {
-			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha(), textAreaErro, textAreaCodigo);
+		//printaExpressao(arrayPosfixa);
+		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 1) {
+			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha() - 1, textAreaErro, textAreaCodigo);
 		}
 
 
@@ -337,7 +360,7 @@ public class Sintatico {
 
 
 
-		System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
+		/*System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
 		printaExpressao(arrayExpressao);
 
 		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO SE:::");
@@ -348,11 +371,11 @@ public class Sintatico {
 		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
 		printaExpressao(arrayPosfixa);
 
-		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA SE POSFIXA:::");
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA SE POSFIXA:::");*/
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
-		printaExpressao(arrayPosfixa);
+		//printaExpressao(arrayPosfixa);
 		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 1) {
-			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha(), textAreaErro, textAreaCodigo);
+			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha() - 1, textAreaErro, textAreaCodigo);
 		}
 
 
@@ -391,6 +414,7 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SPROCEDIMENTO.getName())) {
 				analisaDeclaracaoProcedimento();
 			} else {
+				flagFuncao = true;
 				analisaDeclaracaoFuncao();
 			}
 
@@ -437,6 +461,7 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
             if (!semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
+            	nomeDaFuncao = tk.getLexema();
                 temp = tk;
 				geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
                 semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", LABEL_CONSTANT + rotulo));
@@ -562,8 +587,11 @@ public class Sintatico {
 			} else {
 				throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 			}
-		} else if (tk.getLexema().equals("verdadeiro") ||
-				tk.getLexema().equals("falso")) {
+		} else if (tk.getSimbolo().equals(Simbolo.SVERDADEIRO.getName()) ||
+				tk.getSimbolo().equals(Simbolo.SFALSO.getName())) {
+			// TODO talvez precise de implementacao semantica
+			arrayExpressao.add(tk.getLexema());
+			arrayExpressaoTipos.add("booleano");
 			tk = sintaticoBuscaToken();
 		} else {
 			throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -587,8 +615,8 @@ public class Sintatico {
 	}
 
 	private void analisaAtribuicao(final Token tokenVariavel) throws SintaticoException, LexicoException, SemanticoException {
-		System.out.println("O TOKEN PARA ATRIBUICAO EHHH:" + tokenVariavel.toString());
-		System.out.println(semantico.pegaTipoVariavel(tokenVariavel.getLexema()));
+		//System.out.println("O TOKEN PARA ATRIBUICAO EHHH:" + tokenVariavel.toString());
+		//System.out.println(semantico.pegaTipoVariavel(tokenVariavel.getLexema()));
         tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
@@ -606,15 +634,24 @@ public class Sintatico {
 		printaExpressao(arrayPosfixa);
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
-		printaExpressao(arrayPosfixa);
 
-		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()).equals("booleano")) {
+		//printaExpressao(arrayPosfixa);
+		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()) == null && !semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema())) {
+			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
+		}
+
+		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(nomeDaFuncao) && flagFuncao) {
+			System.out.println("Atribuicao para funcao, ou seja, retorno declarado");
+			flagFuncaoAtribuicao = true;
+		}
+
+		if ("booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema())) || "booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema()))) {
 			if(semantico.validaRetornoExpressao(arrayPosfixa, tokenVariavel.getLinha(), textAreaErro, textAreaCodigo) != 0) {
-				throw SemanticoException.erroSemantico("Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
+				throw SemanticoException.erroSemantico("[variavel ou funcao booleana] Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		} else {
 			if(semantico.validaRetornoExpressao(arrayPosfixa, tokenVariavel.getLinha(), textAreaErro, textAreaCodigo) != 1) {
-				throw SemanticoException.erroSemantico("Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
+				throw SemanticoException.erroSemantico("[inteiro] Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 			}
 		}
 

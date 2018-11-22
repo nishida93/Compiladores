@@ -37,7 +37,9 @@ public enum Simbolo {
     SE("se"),
     SOU("sou"),
     SNAO("snao"),
-    SDOISPONTOS("sdois_pontos");
+    SDOISPONTOS("sdois_pontos"),
+    SVERDADEIRO("sverdadeiro"),
+    SFALSO("sfalso");
 
     private final String name;
 

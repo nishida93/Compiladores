@@ -20,7 +20,10 @@ public class Semantico {
 
     private static ArrayList<String> OPERADORES_ARITMETICOS = new ArrayList<>(Arrays.asList(new String[] { "+", "-","*","div"}));
     private static ArrayList<String> OPERADORES_RELACIONAIS = new ArrayList<>(Arrays.asList(new String[] { ">", ">=","<","<=","!=","="}));
-    private static ArrayList<String> OPERADORES_LOGICOS = new ArrayList<>(Arrays.asList(new String[] { "e", "ou","nao"}));
+    private static ArrayList<String> OPERADORES_LOGICOS = new ArrayList<>(Arrays.asList(new String[] { "e", "ou"}));
+    private static ArrayList<String> OPERADOR_LOGICO_NAO = new ArrayList<>(Arrays.asList(new String[] {"nao"}));
+
+    ArrayList<String> pilhapfixa = new ArrayList<>();
 
 
     public Semantico() {
@@ -99,10 +102,6 @@ public class Semantico {
 
     public boolean isTipoInteiro(final String lexema) {
         return tabelaSimbolos.verificaSeTipoInteiro(lexema);
-    }
-
-    public void printaVariaveis() {
-        tabelaSimbolos.printaVariaveis();
     }
 
     public String buscaPosicaoSimbolo(final Token tk) {
@@ -200,6 +199,18 @@ public class Semantico {
                 }
             }
 
+            if (OPERADOR_LOGICO_NAO.contains(s)) {
+                String temp1 = String.valueOf(expressaoParam.get(controle-1));
+                if (temp1.equals("booleano")) {
+                    expressaoParam.remove(controle);
+                    expressaoParam.remove(controle-1);
+                    expressaoParam.add(controle-1, "booleano");
+                    controle=0;
+                } else {
+                    throw SemanticoException.erroSemantico("Erro durante a expressao", linha-1, textAreaErro, textAreaCodigo);
+                }
+            }
+
             controle++;
         }
         return expressaoParam.get(0).equals("booleano") ? 0 : 1;
@@ -208,4 +219,5 @@ public class Semantico {
     public String pegaTipoFuncao(String lexema) {
         return tabelaSimbolos.pegaTipoFuncao(lexema);
     }
+
 }

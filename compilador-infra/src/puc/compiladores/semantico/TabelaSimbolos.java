@@ -19,11 +19,16 @@ public class TabelaSimbolos {
     }
 
     public boolean verificaDuplicidade(final String lexema) {
+        Collections.reverse(pilha);
         for (Simbolo simbolo: pilha) {
-            if (simbolo.getLexema().equals(lexema) && (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma)) {
+            if (simbolo.getLexema().equals(lexema)) {
+                Collections.reverse(pilha);
                 return true;
+            } else if (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma) {
+                break;
             }
         }
+        Collections.reverse(pilha);
         return false;
     }
 
@@ -35,8 +40,7 @@ public class TabelaSimbolos {
             if (simbolo.getLexema().equals(lexema)) {
                 Collections.reverse(pilha);
                 return true;
-            }
-            if (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma) {
+            } else if (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma) {
                 continue;
             }
         }
