@@ -23,6 +23,8 @@ public class Posfixa {
     private ArrayList<String> trataPilha() {
 
         String aux = "";
+        ArrayList<String> auxParenteses = new ArrayList<>();
+        ArrayList<String> auxNao = new ArrayList<>();
         for (String elemento: arrayInfixa) {
             if(elemento.equals("*") || elemento.equals("div") ||
                     elemento.equals("+") || elemento.equals("-") ||
@@ -33,17 +35,27 @@ public class Posfixa {
                 trataElemento(elemento);
             } else if (elemento.equals("(")) {
                 arrayAux.add(elemento);
+                auxParenteses.add("(");
             } else if (elemento.equals(")")) {
                 removeParenteses();
-            } else if (elemento.equals("+u") || elemento.equals("-u") ||
-                    elemento.equals("nao")) {
+                if(auxNao.size() > 0) {
+                    arrayPosfixa.add("nao");
+                    auxNao.remove(auxNao.size() - 1);
+                }
+                auxParenteses.remove(auxParenteses.size() - 1);
+            } else if (elemento.equals("+u") || elemento.equals("-u")) {
                 aux = elemento;
-            } else {
+            } else if(elemento.equals("nao")){
+                auxNao.add("nao");
+            }else {
                 arrayPosfixa.add(elemento);
-                if(aux.equals("+u") || aux.equals("-u") ||
-                        aux.equals("nao")){
+                if(aux.equals("+u") || aux.equals("-u")){
                     arrayPosfixa.add(aux);
                     aux = "";
+                }
+                if(auxParenteses.size() < 0 && auxNao.size() > 0) {
+                    arrayPosfixa.add("nao");
+                    auxNao.remove(auxNao.size() - 1);
                 }
             }
         }
@@ -89,7 +101,7 @@ public class Posfixa {
         for (i = arrayAux.size() - 1; i >= 0; i--) {
             if(arrayAux.get(i).equals("(")) {
                 break;
-            }else if(pegaPrioridade(arrayAux.get(i)) <= pegaPrioridade(expressao)) {
+            }else if(pegaPrioridade(arrayAux.get(i)) >= pegaPrioridade(expressao)) {
                 arrayPosfixa.add(arrayAux.get(i));
                 arrayAux.remove(i);
                 break;
