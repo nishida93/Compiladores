@@ -32,8 +32,6 @@ public class Sintatico {
 	private Token previousTk;
 	private JTextArea textAreaErro;
 	private JTextArea textAreaCodigo;
-	private String lexemaEscopo;
-	private String lexemaEscopoAux;
 	private ArrayList<String> arrayExpressao;
 	private ArrayList<String> arrayExpressaoTipos;
 	private int rotulo;
@@ -42,6 +40,9 @@ public class Sintatico {
 	private Posfixa posfixa;
 	private Stack<Scope> pilhaEscopos = new Stack<>();
 	private int controleAllocs = 0;
+	private boolean flagEnquantoComandos=false;
+	private boolean flagSeComandos=false;
+	private boolean flagComandosSimples=false;
 
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
 		textAreaError.setText("");
@@ -188,18 +189,20 @@ public class Sintatico {
 					throw SintaticoException.erroCaracterInvalido(tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 				}
 			}
-			System.out.println("Finalizando func/proc " + lexemaEscopo);
 
-			final Scope scope = pilhaEscopos.pop();
-			if (scope.isProgram()) {
-				System.out.println("FINALIZANDO PROGRAMA:::" + scope.getName());
-			} else if (scope.isFunction()) {
-				// TODO implementar o RETURNF
-				System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
-			} else if (scope.isProcedure()) {
-				// TODO implementar o RETURN
-				System.out.println("FINALIZANDO PROCEDURE:::" + scope.getName());
-			}
+			if (!flagEnquantoComandos && !flagSeComandos && !flagComandosSimples) {
+				System.out.println("PILHA DE ESCOPOS >>> " + pilhaEscopos.peek().toString());
+				final Scope scope = pilhaEscopos.pop();
+				if (scope.isProgram()) {
+					System.out.println("FINALIZANDO PROGRAM:::" + scope.getName());
+				} else if (scope.isFunction()) {
+						// TODO implementar o RETURNF
+						System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
+					} else if (scope.isProcedure()) {
+						// TODO implementar o RETURN
+						System.out.println("FINALIZANDO PROCEDURE:::" + scope.getName());
+					}
+				}
 
 			tk = sintaticoBuscaToken();
 		} else {
@@ -223,7 +226,13 @@ public class Sintatico {
 					 .equals(Simbolo.SESCREVA.getName())) {
 			analisaEscreva();
 		} else {
+			if (!flagEnquantoComandos && !flagSeComandos) {
+				flagComandosSimples=true;
+			}
 			analisaComandos();
+			if (!flagEnquantoComandos && !flagSeComandos) {
+				flagComandosSimples=false;
+			}
 		}
 	}
 
@@ -328,9 +337,11 @@ public class Sintatico {
 
 
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
+			flagEnquantoComandos=true;
 			auxrot2 = rotulo;
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
+			flagEnquantoComandos=false;
 			geracaoCodigo.generateJump("JMP", "L"+rotulo);
 			rotulo++;
 			geracaoCodigo.generateJump("JMP", "L"+auxrot1);
@@ -376,10 +387,14 @@ public class Sintatico {
 
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
 			tk = sintaticoBuscaToken();
+			flagSeComandos=true;
 			analisaComandoSimples();
+			flagSeComandos=false;
 			if (tk.getSimbolo().equals(Simbolo.SSENAO.getName())) {
 				tk = sintaticoBuscaToken();
+				flagSeComandos=true;
 				analisaComandoSimples();
+				flagSeComandos=false;
 			}
 		} else {
 			throw SintaticoException.erroSintatico("[ANALISA SE] Faltou a palavra 'entao'", tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -424,10 +439,7 @@ public class Sintatico {
 		if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 		    if (!semantico.pesquisaDeclaracaoProcedimentoTabelaSimbolos(tk.getLexema())) {
 				pilhaEscopos.push(Scope.createProcedureScope(tk.getLexema()));
-				if (lexemaEscopo != null) { // para nao perder procedimentos dentro de outros procedimentos
-					lexemaEscopoAux = lexemaEscopo;
-				}
-		    	lexemaEscopo = tk.getLexema();
+
                 semantico.insereTabelaSimbolos(new SimboloProcedimento(tk.getLexema(), "", LABEL_CONSTANT + rotulo));
 				geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
 				rotulo++;
@@ -455,10 +467,6 @@ public class Sintatico {
 				geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
                 semantico.insereTabelaSimbolos(new SimboloFuncao(tk.getLexema(), "", LABEL_CONSTANT + rotulo));
 				rotulo++;
-				if (lexemaEscopo != null) { // para nao perder procedimentos dentro de outros procedimentos
-					lexemaEscopoAux = lexemaEscopo;
-				}
-				lexemaEscopo = tk.getLexema();
 
                 tk = sintaticoBuscaToken();
                 if (tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {

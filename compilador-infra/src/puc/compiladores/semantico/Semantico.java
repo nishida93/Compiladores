@@ -22,6 +22,7 @@ public class Semantico {
     private static ArrayList<String> OPERADORES_RELACIONAIS = new ArrayList<>(Arrays.asList(new String[] { ">", ">=","<","<=","!=","="}));
     private static ArrayList<String> OPERADORES_LOGICOS = new ArrayList<>(Arrays.asList(new String[] { "e", "ou"}));
     private static ArrayList<String> OPERADOR_LOGICO_NAO = new ArrayList<>(Arrays.asList(new String[] {"nao"}));
+    private static ArrayList<String> OPERADORES_UNARIOS = new ArrayList<>(Arrays.asList(new String[] {"-u","+u"}));
 
     ArrayList<String> pilhapfixa = new ArrayList<>();
 
@@ -208,6 +209,24 @@ public class Semantico {
                     controle=0;
                 } else {
                     throw SemanticoException.erroSemantico("Erro durante a expressao", linha-1, textAreaErro, textAreaCodigo);
+                }
+            }
+
+            if (OPERADORES_UNARIOS.contains(s)) {
+                String temp1 = String.valueOf(expressaoParam.get(controle-1));
+
+                try {
+                    Integer result1 = Integer.parseInt(String.valueOf(temp1));
+                    temp1 = "inteiro";
+                } catch (NumberFormatException e) {}
+
+                if (temp1.equals("inteiro")) {
+                    expressaoParam.remove(controle);
+                    expressaoParam.remove(controle-1);
+                    expressaoParam.add(controle-1, "inteiro");
+                    controle=0;
+                } else {
+                    throw SemanticoException.erroSemantico("Erro durante a expressao", linha, textAreaErro, textAreaCodigo);
                 }
             }
 

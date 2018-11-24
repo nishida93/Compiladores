@@ -54,4 +54,9 @@ public class Scope {
 		FUNCTION,
 		PROCEDURE
 	}
+
+	@Override
+	public String toString() {
+		return "Scope{" + "type=" + type + ", name='" + name + '\'' + ", varCount=" + varCount + '}';
+	}
 }
