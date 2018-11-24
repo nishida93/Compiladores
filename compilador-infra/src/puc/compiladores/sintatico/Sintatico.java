@@ -44,6 +44,8 @@ public class Sintatico {
 	private boolean flagSeComandos=false;
 	private boolean flagComandosSimples=false;
 
+	private ArrayList<SimboloVariavel> simboloVariavelArrayList;
+
 	public Sintatico(File arquivo, JTextArea textAreaError, JTextArea textAreaCod) throws Exception {
 		textAreaError.setText("");
 	    textAreaErro = textAreaError;
@@ -73,8 +75,6 @@ public class Sintatico {
 						if (previousTk.getSimbolo().equals(Simbolo.SPONTO.getName()) && tk == null) {
 							textAreaErro.setText("EXECUTADO COM SUCESSO");
 							textAreaErro.setForeground(Color.GREEN);
-							geracaoCodigo.generateHlt();
-							geracaoCodigo.generateClose();
 						} else {
 							throw SintaticoException.erroSintatico("Caracter invalido " + tk.getLexema(), tk.getLinha(), textAreaErro, textAreaCodigo);
 						}
@@ -105,8 +105,6 @@ public class Sintatico {
 		tk = sintaticoBuscaToken();
 
 		analisaEtVariaveis();
-		System.out.println("Quantidade de variaveis declaradas::: " + posicaoVariaveis);
-
 		analisaSubRotinas();
 		analisaComandos();
 	}
@@ -130,10 +128,9 @@ public class Sintatico {
 	}
 
 	private void analisaVariaveis() throws SintaticoException, LexicoException, SemanticoException {
-		ArrayList<SimboloVariavel> simboloVariavelArrayList = new ArrayList<>();
+		simboloVariavelArrayList = new ArrayList<>();
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-				//System.out.println("O identificador eh >>> " + tk.getLexema());
                 if (!semantico.existeDuplicidadeVariavel(tk.getLexema())) {
                     simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
 
@@ -158,6 +155,7 @@ public class Sintatico {
 		}
 		tk = sintaticoBuscaToken();
 		analisaTipo(simboloVariavelArrayList);
+		simboloVariavelArrayList = new ArrayList<>();
 	}
 
 	private void analisaTipo(ArrayList<SimboloVariavel> simboloVariavelArrayList) throws SintaticoException, LexicoException {
@@ -166,7 +164,7 @@ public class Sintatico {
 		} else {
             for (SimboloVariavel simboloVariavel:
                  simboloVariavelArrayList) {
-				System.out.println("Inserindo variavel: " + simboloVariavel.getLexema());
+				//System.out.println("Inserindo variavel: " + simboloVariavel.getLexema());
 				semantico.insereTabelaSimbolos(new SimboloVariavel(simboloVariavel.getLexema(), tk.getLexema(), posicaoVariaveis));
 				geracaoCodigo.geraAlloc(controleAllocs);
 				controleAllocs++;
@@ -195,14 +193,24 @@ public class Sintatico {
 				final Scope scope = pilhaEscopos.pop();
 				if (scope.isProgram()) {
 					System.out.println("FINALIZANDO PROGRAM:::" + scope.getName());
+					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
+					geracaoCodigo.geraDalloc(0, qtdeVariaveis);
+					geracaoCodigo.generateHlt();
+					geracaoCodigo.generateClose();
+					posicaoVariaveis = posicaoVariaveis - qtdeVariaveis;
 				} else if (scope.isFunction()) {
-						// TODO implementar o RETURNF
-						System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
-					} else if (scope.isProcedure()) {
-						// TODO implementar o RETURN
-						System.out.println("FINALIZANDO PROCEDURE:::" + scope.getName());
-					}
+					System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
+					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
+					geracaoCodigo.geraReturnf(posicaoVariaveis-1, qtdeVariaveis);
+					posicaoVariaveis = posicaoVariaveis -qtdeVariaveis;
+				} else if (scope.isProcedure()) {
+					System.out.println("FINALIZANDO PROCEDURE:::" + scope.getName());
+					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
+					geracaoCodigo.geraDalloc(posicaoVariaveis-1, qtdeVariaveis);
+					geracaoCodigo.geraReturn();
+					posicaoVariaveis = posicaoVariaveis - qtdeVariaveis;
 				}
+			}
 
 			tk = sintaticoBuscaToken();
 		} else {

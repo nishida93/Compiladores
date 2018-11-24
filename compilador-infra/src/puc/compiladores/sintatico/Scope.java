@@ -6,8 +6,6 @@ public class Scope {
 
 	private String name;
 
-	private int varCount;
-
 	private Scope(final ScopeType type, final String name) {
 		this.type = type;
 		this.name = name;
@@ -27,14 +25,6 @@ public class Scope {
 
 	public String getName() {
 		return name;
-	}
-
-	public void setVarCount(final int varCount) {
-		this.varCount = varCount;
-	}
-
-	public int getVarCount() {
-		return varCount;
 	}
 
 	public boolean isProgram() {
@@ -57,6 +47,6 @@ public class Scope {
 
 	@Override
 	public String toString() {
-		return "Scope{" + "type=" + type + ", name='" + name + '\'' + ", varCount=" + varCount + '}';
+		return "Scope{" + "type=" + type + ", name='" + name + '\'' + '}';
 	}
 }

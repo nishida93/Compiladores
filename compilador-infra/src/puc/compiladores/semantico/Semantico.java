@@ -97,8 +97,8 @@ public class Semantico {
         tabelaSimbolos.colocaTipo(lexema, tipo);
     }
 
-    public void desempilhaSimbolos(final String lexemaEscopo) {
-        tabelaSimbolos.desempilha(lexemaEscopo);
+    public int desempilhaSimbolos(final String lexemaEscopo) {
+        return tabelaSimbolos.desempilha(lexemaEscopo);
     }
 
     public boolean isTipoInteiro(final String lexema) {

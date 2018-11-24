@@ -85,4 +85,21 @@ public class GeracaoCodigo {
 	public void geraAlloc(final int controle) {
 		fileWriter.println("ALLOC " + controle + ",1");
 	}
+
+	public void geraDalloc(final int posicaoVariaveis, final int qtdeVariaveis) {
+		fileWriter.println("DALLOC " + posicaoVariaveis + "," + qtdeVariaveis);
+	}
+
+	public void geraReturnf(final int posicaoVariaveis, final int qtdeVariaveis) {
+		if (qtdeVariaveis > 0) {
+			fileWriter.println("RETURNF " + posicaoVariaveis + "," + qtdeVariaveis);
+		} else {
+			fileWriter.println("RETURNF");
+		}
+
+	}
+
+	public void geraReturn() {
+		fileWriter.println("RETURN");
+	}
 }

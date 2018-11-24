@@ -81,7 +81,8 @@ public class TabelaSimbolos {
 		}
 	}
 
-    public void desempilha(final String lexemaEscopo) {
+    public int desempilha(final String lexemaEscopo) {
+        int contadorVariaveis = 0;
         ArrayList<Simbolo> tmpToRemove = new ArrayList<>();
         Collections.reverse(pilha);
         System.out.println("Desempilhando ate LEXEMA >" + lexemaEscopo);
@@ -92,10 +93,14 @@ public class TabelaSimbolos {
                 continue;
             }*/
             System.out.println("Desempilhando o simbolo >> " + simbolo.toString());
+            if (simbolo instanceof SimboloVariavel) {
+                contadorVariaveis++;
+            }
             tmpToRemove.add(simbolo);
         }
         pilha.removeAll(tmpToRemove);
         Collections.reverse(pilha);
+        return contadorVariaveis;
     }
 
     public boolean verificaSeTipoInteiro(final String lexema) {
