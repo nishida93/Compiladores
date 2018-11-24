@@ -33,16 +33,18 @@ public class Sintatico {
 	private JTextArea textAreaErro;
 	private JTextArea textAreaCodigo;
 	private ArrayList<String> arrayExpressao;
-	private ArrayList<String> arrayExpressaoTipos;
-	private int rotulo;
+	private ArrayList<String> arrayExpressaoTipos = new ArrayList<>();;
+	private int rotulo = 1;
 	private int posicaoVariaveis;
 	private ArrayList<String> arrayPosfixa;
 	private Posfixa posfixa;
 	private Stack<Scope> pilhaEscopos = new Stack<>();
 	private int controleAllocs = 0;
+
 	private boolean flagEnquantoComandos=false;
 	private boolean flagSeComandos=false;
 	private boolean flagComandosSimples=false;
+	private boolean flagAtribuicaoFuncao=false;
 
 	private ArrayList<SimboloVariavel> simboloVariavelArrayList;
 
@@ -51,10 +53,6 @@ public class Sintatico {
 	    textAreaErro = textAreaError;
 	    textAreaCodigo = textAreaCod;
 		lx = new Lexico(arquivo, textAreaErro, textAreaCodigo);
-		arrayExpressaoTipos = new ArrayList<>();
-		controle = 0;
-		rotulo = 1;
-		posicaoVariaveis = 0;
 
 		while (!lx.isFileOver(controle)) {
 			tk = sintaticoBuscaToken();
@@ -200,6 +198,9 @@ public class Sintatico {
 					posicaoVariaveis = posicaoVariaveis - qtdeVariaveis;
 				} else if (scope.isFunction()) {
 					System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
+					if (!flagAtribuicaoFuncao) {
+						throw SemanticoException.erroSemantico("Faltou declarar retorno da funcao " + scope.getName(), tk.getLinha()-1, textAreaErro, textAreaCodigo);
+					}
 					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
 					geracaoCodigo.geraReturnf(posicaoVariaveis-1, qtdeVariaveis);
 					posicaoVariaveis = posicaoVariaveis -qtdeVariaveis;
@@ -645,12 +646,12 @@ public class Sintatico {
 			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 		}
 		// TODO validar se tem atribuicao com o nome da funcao
-		/*if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(nomeDaFuncao) && flagFuncao) {
+		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema()) && pilhaEscopos.peek().isFunction()) {
 			System.out.println("Atribuicao para funcao, ou seja, retorno declarado");
-			flagFuncaoAtribuicao = true;
-		}*/
+			flagAtribuicaoFuncao = true;
+		}
 
-		if ("booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema())) || "booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema()))) {
+		if ("booleano".equals(semantico.pegaTipoVariavel(tokenVariavel.getLexema())) || "booleano".equals(semantico.pegaTipoFuncao(tokenVariavel.getLexema()))) {
 			if(semantico.validaRetornoExpressao(arrayPosfixa, tokenVariavel.getLinha(), textAreaErro, textAreaCodigo) != 0) {
 				throw SemanticoException.erroSemantico("[variavel ou funcao booleana] Incompatibilidade durante atribuicao", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 			}
