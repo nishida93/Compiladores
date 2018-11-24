@@ -85,7 +85,6 @@ public class Posfixa {
             }else if(pegaPrioridade(arrayAux.get(i)) >= pegaPrioridade(expressao)) {
                 arrayPosfixa.add(arrayAux.get(i));
                 arrayAux.remove(i);
-                break;
             }
         }
     }
