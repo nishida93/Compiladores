@@ -51,29 +51,6 @@ public class GeracaoCodigo {
 		fileWriter.println("CALL " + label);
 	}
 
-	public void generateAlloc(String comando, String numeros)
-	{
-		if(comando.equals("ALLOC "))
-		{
-			fileWriter.println(comando+numeros);
-		}
-
-		if(comando.equals("DALLOC "))
-		{
-			fileWriter.println(comando+numeros);
-		}
-	}
-
-	public String geraRotulo() {
-		String ret = "L" + rotulo;
-		rotulo++;
-		return ret;
-	}
-
-	public String pegaRotulo() {
-		return "L" + rotulo;
-	}
-
 	public void generateLdv(final String buscaPosicaoSimbolo) {
 		fileWriter.println("LDV " + buscaPosicaoSimbolo);
 	}

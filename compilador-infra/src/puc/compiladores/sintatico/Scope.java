@@ -6,6 +6,8 @@ public class Scope {
 
 	private String name;
 
+	private int allocFirstParameter;
+
 	private Scope(final ScopeType type, final String name) {
 		this.type = type;
 		this.name = name;
@@ -25,6 +27,14 @@ public class Scope {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setAllocFirstParameter(final int allocFirstParameter) {
+		this.allocFirstParameter = allocFirstParameter;
+	}
+
+	public int getAllocFirstParameter() {
+		return allocFirstParameter;
 	}
 
 	public boolean isProgram() {
@@ -47,6 +57,6 @@ public class Scope {
 
 	@Override
 	public String toString() {
-		return "Scope{" + "type=" + type + ", name='" + name + '\'' + '}';
+		return "Scope{" + "type=" + type + ", name='" + name + '\'' + ", allocFirstParameter=" + allocFirstParameter + '}';
 	}
 }

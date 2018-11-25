@@ -160,9 +160,13 @@ public class Sintatico {
 		if (!tk.getSimbolo().equals(Simbolo.SINTEIRO.getName()) && !tk.getSimbolo().equals(Simbolo.SBOOLEANO.getName())) {
 			throw SintaticoException.erroSintatico("Tipo de variavel invalido", tk.getLinha(), textAreaErro, textAreaCodigo);
 		} else {
+			int currentScopePosition = pilhaEscopos.indexOf(pilhaEscopos.peek());
+			Scope scope = pilhaEscopos.get(currentScopePosition);
+			scope.setAllocFirstParameter(controleAllocs);
+			pilhaEscopos.set(currentScopePosition, scope);
             for (SimboloVariavel simboloVariavel:
                  simboloVariavelArrayList) {
-				//System.out.println("Inserindo variavel: " + simboloVariavel.getLexema());
+
 				semantico.insereTabelaSimbolos(new SimboloVariavel(simboloVariavel.getLexema(), tk.getLexema(), posicaoVariaveis));
 				geracaoCodigo.geraAlloc(controleAllocs);
 				controleAllocs++;
@@ -190,26 +194,28 @@ public class Sintatico {
 				System.out.println("PILHA DE ESCOPOS >>> " + pilhaEscopos.peek().toString());
 				final Scope scope = pilhaEscopos.pop();
 				if (scope.isProgram()) {
-					System.out.println("FINALIZANDO PROGRAM:::" + scope.getName());
+					System.out.println("FINALIZANDO PROGRAM:::" + scope.toString());
 					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
 					geracaoCodigo.geraDalloc(0, qtdeVariaveis);
 					geracaoCodigo.generateHlt();
 					geracaoCodigo.generateClose();
 					posicaoVariaveis = posicaoVariaveis - qtdeVariaveis;
 				} else if (scope.isFunction()) {
-					System.out.println("FINALIZANDO FUNCTION:::" + scope.getName());
+					System.out.println("FINALIZANDO FUNCTION:::" + scope.toString());
 					if (!flagAtribuicaoFuncao) {
 						throw SemanticoException.erroSemantico("Faltou declarar retorno da funcao " + scope.getName(), tk.getLinha()-1, textAreaErro, textAreaCodigo);
 					}
 					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
-					geracaoCodigo.geraReturnf(posicaoVariaveis-1, qtdeVariaveis);
+					geracaoCodigo.geraReturnf(scope.getAllocFirstParameter(), qtdeVariaveis);
 					posicaoVariaveis = posicaoVariaveis -qtdeVariaveis;
+					controleAllocs = posicaoVariaveis;
 				} else if (scope.isProcedure()) {
-					System.out.println("FINALIZANDO PROCEDURE:::" + scope.getName());
+					System.out.println("FINALIZANDO PROCEDURE:::" + scope.toString());
 					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
-					geracaoCodigo.geraDalloc(posicaoVariaveis-1, qtdeVariaveis);
+					geracaoCodigo.geraDalloc(scope.getAllocFirstParameter(), qtdeVariaveis);
 					geracaoCodigo.geraReturn();
 					posicaoVariaveis = posicaoVariaveis - qtdeVariaveis;
+					controleAllocs = posicaoVariaveis;
 				}
 			}
 
