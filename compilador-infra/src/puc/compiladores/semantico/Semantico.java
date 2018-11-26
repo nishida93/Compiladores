@@ -24,6 +24,7 @@ public class Semantico {
     private static ArrayList<String> OPERADORES_LOGICOS = new ArrayList<>(Arrays.asList(new String[] { "e", "ou"}));
     private static ArrayList<String> OPERADOR_LOGICO_NAO = new ArrayList<>(Arrays.asList(new String[] {"nao"}));
     private static ArrayList<String> OPERADORES_UNARIOS = new ArrayList<>(Arrays.asList(new String[] {"-u","+u"}));
+    private static ArrayList<String> PALAVRAS_BOOLEANAS = new ArrayList<>(Arrays.asList(new String[] {"verdadeiro","falso"}));
 
     ArrayList<String> pilhapfixa = new ArrayList<>();
 
@@ -255,7 +256,7 @@ public class Semantico {
                     } else if (value.equals("-")) {
                         geracaoCodigo.generateSimpleInstruction("SUB");
                     } else if (value.equals("*")) {
-                        geracaoCodigo.generateSimpleInstruction("MUL");
+                        geracaoCodigo.generateSimpleInstruction("MULT");
                     } else if (value.equals("div")) {
                         geracaoCodigo.generateSimpleInstruction("DIVI");
                     }
@@ -267,7 +268,38 @@ public class Semantico {
                         geracaoCodigo.generateSimpleInstruction("OR");
                     }
                 }
+                if (OPERADORES_RELACIONAIS.contains(value)) { //">", ">=","<","<=","!=","="
+                    if (value.equals(">")) {
+                        geracaoCodigo.generateSimpleInstruction("CMA");
+                    } else if (value.equals(">=")) {
+                        geracaoCodigo.generateSimpleInstruction("CMAQ");
+                    } else if (value.equals("<")) {
+                        geracaoCodigo.generateSimpleInstruction("CME");
+                    } else if (value.equals("<=")) {
+                        geracaoCodigo.generateSimpleInstruction("CMEQ");
+                    } else if (value.equals("!=")) {
+                        geracaoCodigo.generateSimpleInstruction("CDIF");
+                    } else if (value.equals("=")) {
+                        geracaoCodigo.generateSimpleInstruction("CEQ");
+                    }
+                }
+                if (PALAVRAS_BOOLEANAS.contains(value)) { // verdadeiro, falso
+                    if (value.equals("verdadeiro")) {
+                        geracaoCodigo.generateLdc("1");
+                    } else if (value.equals("falso")) {
+                        geracaoCodigo.generateLdc("0");
+                    }
+                }
 
+                if (OPERADOR_LOGICO_NAO.contains(value)) {
+                    if (value.equals("nao")) {
+                        geracaoCodigo.generateSimpleInstruction("NEG");
+                    }
+                }
+                // TODO gerar NEG (unario)
+                if (value.equals("-u")) {
+                    geracaoCodigo.generateSimpleInstruction("INV");
+                }
             }
         }
     }

@@ -266,12 +266,15 @@ public class Sintatico {
 	}
 
 	private void analisaLeia() throws SintaticoException, LexicoException, SemanticoException {
+		geracaoCodigo.generateSimpleInstruction("RD");
 		tk = sintaticoBuscaToken();
 		if (tk.getSimbolo().equals(Simbolo.SABREPARENTESES.getName())) {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 			    if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
 			    	if (semantico.isTipoInteiro(tk.getLexema())) {
+			    		String posicao = semantico.buscaPosicaoSimbolo(tk.getLexema());
+			    		geracaoCodigo.generateStr(posicao);
 						tk = sintaticoBuscaToken();
 						if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
 							tk = sintaticoBuscaToken();
@@ -298,7 +301,7 @@ public class Sintatico {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema()) || semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
-					if (semantico.isTipoInteiro(tk.getLexema()) || semantico.pegaTipoFuncao(tk.getLexema()).equals("inteiro")) {
+					if (semantico.isTipoInteiro(tk.getLexema()) || "inteiro".equals(semantico.pegaTipoFuncao(tk.getLexema()))) {
 						geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk.getLexema()));
 						geracaoCodigo.generatePrn();
 						tk = sintaticoBuscaToken();
@@ -325,7 +328,7 @@ public class Sintatico {
 	private void analisaEnquanto() throws SintaticoException, LexicoException, SemanticoException {
 		int auxrot1 = 0,
 			auxrot2 = 0;
-		auxrot1 = geracaoCodigo.getRotulo();
+		auxrot1 = rotulo;
 		geracaoCodigo.generateLabel(LABEL_CONSTANT + rotulo);
 		rotulo++;
 		tk = sintaticoBuscaToken();
@@ -335,15 +338,21 @@ public class Sintatico {
 		posfixa = new Posfixa();
 		analisaExpressao(); // deve retornar um booleano
 
-		/*System.out.println(":::EXPRESSAO PARA COMANDO ENQUANTO:::");
+		System.out.println(":::EXPRESSAO PARA ANALISA ENQUANTO:::");
 		printaExpressao(arrayExpressao);
-
-		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO ENQUANTO:::");
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ENQUANTO:::");
 		printaExpressao(arrayExpressaoTipos);
+		System.out.println(":::EXPRESSAO PARA ANALISA ENQUANTO POSFIXA:::");
+		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
+		printaExpressao(arrayPosfixa);
+		// TODO finalizar a geracao da expressao
+		semantico.geraCodigoExpressao(arrayPosfixa, geracaoCodigo);
 
-		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ENQUANTO POSFIXA:::");*/
+		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
+
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
-		//printaExpressao(arrayPosfixa);
+
 		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 1) {
 			throw SemanticoException.erroSemantico("Incompatibilidade de retorno", tk.getLinha() - 1, textAreaErro, textAreaCodigo);
 		}
@@ -358,19 +367,24 @@ public class Sintatico {
 		if (tk.getSimbolo().equals(Simbolo.SFACA.getName())) {
 			flagEnquantoComandos=true;
 			auxrot2 = rotulo;
+			geracaoCodigo.geraJumpf(LABEL_CONSTANT + rotulo);
+			rotulo++;
 			tk = sintaticoBuscaToken();
 			analisaComandoSimples();
 			flagEnquantoComandos=false;
-			geracaoCodigo.generateJump("JMP", "L"+rotulo);
-			rotulo++;
-			geracaoCodigo.generateJump("JMP", "L"+auxrot1);
-			geracaoCodigo.generateLabel("L" + auxrot2);
+			geracaoCodigo.geraJump(LABEL_CONSTANT + auxrot1);
+			geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot2);
 		} else {
 			throw SintaticoException.erroSintatico("[ANALISA ENQUANTO] Faltou a palavra 'faca'", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
 	}
 
 	private void analisaSe() throws SintaticoException, LexicoException, SemanticoException {
+		int auxrot1, auxrot2;
+		auxrot1 = rotulo;
+		rotulo++;
+		auxrot2 = rotulo;
+		rotulo++;
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
@@ -379,18 +393,19 @@ public class Sintatico {
 
 
 
-		/*System.out.println(":::EXPRESSAO PARA COMANDO SE:::");
+		System.out.println(":::EXPRESSAO PARA ANALISA SE:::");
 		printaExpressao(arrayExpressao);
-
-		System.out.println(":::EXPRESSAO TIPOS PARA COMANDO SE:::");
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA SE:::");
 		printaExpressao(arrayExpressaoTipos);
-
-		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
+		System.out.println(":::EXPRESSAO PARA ANALISA SE POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
-		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
 		printaExpressao(arrayPosfixa);
+		// TODO finalizar a geracao da expressao
+		semantico.geraCodigoExpressao(arrayPosfixa, geracaoCodigo);
 
-		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA SE POSFIXA:::");*/
+		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
+
+		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
 		//printaExpressao(arrayPosfixa);
 		if (semantico.validaRetornoExpressao(arrayPosfixa, tk.getLinha(), textAreaErro, textAreaCodigo) == 1) {
@@ -403,18 +418,22 @@ public class Sintatico {
 		arrayPosfixa = new ArrayList<>();
 		posfixa = new Posfixa();
 
+		geracaoCodigo.geraJumpf(LABEL_CONSTANT + auxrot1);
 
 		if (tk.getSimbolo().equals(Simbolo.SENTAO.getName())) {
 			tk = sintaticoBuscaToken();
 			flagSeComandos=true;
 			analisaComandoSimples();
 			flagSeComandos=false;
+			geracaoCodigo.geraJump(LABEL_CONSTANT + auxrot2);
+			geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot1);
 			if (tk.getSimbolo().equals(Simbolo.SSENAO.getName())) {
 				tk = sintaticoBuscaToken();
 				flagSeComandos=true;
 				analisaComandoSimples();
 				flagSeComandos=false;
 			}
+			geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot2);
 		} else {
 			throw SintaticoException.erroSintatico("[ANALISA SE] Faltou a palavra 'entao'", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
@@ -646,17 +665,18 @@ public class Sintatico {
 		printaExpressao(arrayExpressaoTipos);
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
-
+		printaExpressao(arrayPosfixa);
 		// TODO finalizar a geracao da expressao
 		semantico.geraCodigoExpressao(arrayPosfixa, geracaoCodigo);
+		String posicaoVariavel = semantico.buscaPosicaoSimbolo(tokenVariavel.getLexema());
+		geracaoCodigo.generateStr(posicaoVariavel);
 
 
 		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
-		printaExpressao(arrayPosfixa);
+
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
 
-		//printaExpressao(arrayPosfixa);
 		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()) == null && !semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema())) {
 			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 		}

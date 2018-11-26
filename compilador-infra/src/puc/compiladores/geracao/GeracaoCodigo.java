@@ -13,10 +13,6 @@ public class GeracaoCodigo {
 		rotulo = 1;
 	}
 
-	public int getRotulo() {
-		return rotulo;
-	}
-
 	public void generateFile(String lexema) throws FileNotFoundException, UnsupportedEncodingException {
 		try {
 			fileWriter = new PrintWriter(lexema + ".txt", "UTF-8");
@@ -88,4 +84,15 @@ public class GeracaoCodigo {
 		fileWriter.println(instruction);
 	}
 
+	public void generateStr(final String posicaoVariavel) {
+		fileWriter.println("STR " + posicaoVariavel);
+	}
+
+	public void geraJumpf(final String label) {
+		fileWriter.println("JMPF " + label);
+	}
+
+	public void geraJump(final String label) {
+		fileWriter.println("JMP " + label);
+	}
 }

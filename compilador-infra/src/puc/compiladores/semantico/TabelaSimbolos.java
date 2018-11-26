@@ -115,11 +115,14 @@ public class TabelaSimbolos {
     }
 
     public String buscaPosicaoSimbolo(final String lexema) {
+        Collections.reverse(pilha);
         for (Simbolo simbolo : pilha) {
             if (simbolo instanceof SimboloVariavel && simbolo.getLexema().equals(lexema)) {
+                Collections.reverse(pilha);
                 return String.valueOf(((SimboloVariavel) simbolo).getPosicao());
             }
         }
+        Collections.reverse(pilha);
         return null;
     }
 
