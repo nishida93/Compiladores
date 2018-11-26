@@ -112,6 +112,7 @@ public class Sintatico {
 			tk = sintaticoBuscaToken();
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 				while (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
+
 					analisaVariaveis();
 					if (tk.getSimbolo().equals(Simbolo.SPONTOVIRGULA.getName())) {
 						tk = sintaticoBuscaToken();
@@ -167,9 +168,10 @@ public class Sintatico {
             for (SimboloVariavel simboloVariavel:
                  simboloVariavelArrayList) {
 
-				semantico.insereTabelaSimbolos(new SimboloVariavel(simboloVariavel.getLexema(), tk.getLexema(), posicaoVariaveis));
+				semantico.insereTabelaSimbolos(new SimboloVariavel(simboloVariavel.getLexema(), tk.getLexema(), simboloVariavel.getPosicao()));
 				geracaoCodigo.geraAlloc(controleAllocs);
 				controleAllocs++;
+				System.out.println("Variavel " + simboloVariavel.getLexema() + " esta alocada na posicao " + simboloVariavel.getPosicao());
             }
 			tk = sintaticoBuscaToken();
 		}
@@ -203,12 +205,14 @@ public class Sintatico {
 				} else if (scope.isFunction()) {
 					System.out.println("FINALIZANDO FUNCTION:::" + scope.toString());
 					if (!flagAtribuicaoFuncao) {
+						//geracaoCodigo.generateSimpleInstruction("RETURNF");
 						throw SemanticoException.erroSemantico("Faltou declarar retorno da funcao " + scope.getName(), tk.getLinha()-1, textAreaErro, textAreaCodigo);
+					} else {
+						final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
+						geracaoCodigo.geraReturnf(scope.getAllocFirstParameter(), qtdeVariaveis);
+						posicaoVariaveis = posicaoVariaveis - qtdeVariaveis;
+						controleAllocs = posicaoVariaveis;
 					}
-					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
-					geracaoCodigo.geraReturnf(scope.getAllocFirstParameter(), qtdeVariaveis);
-					posicaoVariaveis = posicaoVariaveis -qtdeVariaveis;
-					controleAllocs = posicaoVariaveis;
 				} else if (scope.isProcedure()) {
 					System.out.println("FINALIZANDO PROCEDURE:::" + scope.toString());
 					final int qtdeVariaveis = semantico.desempilhaSimbolos(scope.getName());
@@ -295,7 +299,7 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema()) || semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
 					if (semantico.isTipoInteiro(tk.getLexema()) || semantico.pegaTipoFuncao(tk.getLexema()).equals("inteiro")) {
-						geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk));
+						geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk.getLexema()));
 						geracaoCodigo.generatePrn();
 						tk = sintaticoBuscaToken();
 						if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
@@ -642,6 +646,11 @@ public class Sintatico {
 		printaExpressao(arrayExpressaoTipos);
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
+
+		// TODO finalizar a geracao da expressao
+		semantico.geraCodigoExpressao(arrayPosfixa, geracaoCodigo);
+
+
 		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
 		printaExpressao(arrayPosfixa);
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
@@ -651,7 +660,7 @@ public class Sintatico {
 		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()) == null && !semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema())) {
 			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
 		}
-		// TODO validar se tem atribuicao com o nome da funcao
+
 		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema()) && pilhaEscopos.peek().isFunction()) {
 			System.out.println("Atribuicao para funcao, ou seja, retorno declarado");
 			flagAtribuicaoFuncao = true;

@@ -79,4 +79,13 @@ public class GeracaoCodigo {
 	public void geraReturn() {
 		fileWriter.println("RETURN");
 	}
+
+	public void generateLdc(final String value) {
+		fileWriter.println("LDC " + value);
+	}
+
+	public void generateSimpleInstruction(final String instruction) {
+		fileWriter.println(instruction);
+	}
+
 }

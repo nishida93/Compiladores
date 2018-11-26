@@ -114,17 +114,9 @@ public class TabelaSimbolos {
         return false;
     }
 
-    public void printaVariaveis() {
+    public String buscaPosicaoSimbolo(final String lexema) {
         for (Simbolo simbolo : pilha) {
-            if (simbolo instanceof SimboloVariavel) {
-                System.out.println("PRINT VARIAVEL >>> " + simbolo.toString());
-            }
-        }
-    }
-
-    public String buscaPosicaoSimbolo(final Token tk) {
-        for (Simbolo simbolo : pilha) {
-            if (simbolo instanceof SimboloVariavel && simbolo.getLexema().equals(tk.getLexema())) {
+            if (simbolo instanceof SimboloVariavel && simbolo.getLexema().equals(lexema)) {
                 return String.valueOf(((SimboloVariavel) simbolo).getPosicao());
             }
         }

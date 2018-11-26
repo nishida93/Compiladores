@@ -1,5 +1,6 @@
 package puc.compiladores.semantico;
 
+import puc.compiladores.geracao.GeracaoCodigo;
 import puc.compiladores.lexico.Token;
 
 import java.util.ArrayList;
@@ -105,8 +106,8 @@ public class Semantico {
         return tabelaSimbolos.verificaSeTipoInteiro(lexema);
     }
 
-    public String buscaPosicaoSimbolo(final Token tk) {
-        return tabelaSimbolos.buscaPosicaoSimbolo(tk);
+    public String buscaPosicaoSimbolo(final String lexema) {
+        return tabelaSimbolos.buscaPosicaoSimbolo(lexema);
     }
 
     public String buscaRotuloProcedimento(final String lexema) {
@@ -239,4 +240,44 @@ public class Semantico {
         return tabelaSimbolos.pegaTipoFuncao(lexema);
     }
 
+    public void geraCodigoExpressao(final ArrayList<String> arrayPosfixa, final GeracaoCodigo geracaoCodigo) {
+        for (String value : arrayPosfixa) {
+            if (isNumeric(value)) { // EH UM NUMERO
+                geracaoCodigo.generateLdc(value);
+            } else if (tabelaSimbolos.existeVariavel(value)) { // EH UMA VARIAVEL
+                geracaoCodigo.generateLdv(tabelaSimbolos.buscaPosicaoSimbolo(value));
+            } else { // EH UM OPERADOR OU PALAVRA RESERVADA
+                if (OPERADORES_ARITMETICOS.contains(value)) {
+                    if (value.equals("+")) {
+                        geracaoCodigo.generateSimpleInstruction("ADD");
+                    } else if (value.equals("-")) {
+                        geracaoCodigo.generateSimpleInstruction("SUB");
+                    } else if (value.equals("-")) {
+                        geracaoCodigo.generateSimpleInstruction("SUB");
+                    } else if (value.equals("*")) {
+                        geracaoCodigo.generateSimpleInstruction("MUL");
+                    } else if (value.equals("div")) {
+                        geracaoCodigo.generateSimpleInstruction("DIVI");
+                    }
+                }
+                if (OPERADORES_LOGICOS.contains(value)) {
+                    if (value.equals("e")) {
+                        geracaoCodigo.generateSimpleInstruction("AND");
+                    } else if (value.equals("ou")) {
+                        geracaoCodigo.generateSimpleInstruction("OR");
+                    }
+                }
+
+            }
+        }
+    }
+
+    public static boolean isNumeric(String strNum) {
+        try {
+            int number = Integer.parseInt(strNum);
+        } catch (NumberFormatException | NullPointerException nfe) {
+            return false;
+        }
+        return true;
+    }
 }
