@@ -302,7 +302,11 @@ public class Sintatico {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
 				if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema()) || semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
 					if (semantico.isTipoInteiro(tk.getLexema()) || "inteiro".equals(semantico.pegaTipoFuncao(tk.getLexema()))) {
-						geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk.getLexema()));
+						if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tk.getLexema())) {
+							geracaoCodigo.generateLdv(semantico.buscaPosicaoSimbolo(tk.getLexema()));
+						} else {
+							geracaoCodigo.generateCall(semantico.buscaRotuloFuncao(tk.getLexema()));
+						}
 						geracaoCodigo.generatePrn();
 						tk = sintaticoBuscaToken();
 						if (tk.getSimbolo().equals(Simbolo.SFECHAPARENTESES.getName())) {
@@ -668,18 +672,22 @@ public class Sintatico {
 		printaExpressao(arrayPosfixa);
 		// TODO finalizar a geracao da expressao
 		semantico.geraCodigoExpressao(arrayPosfixa, geracaoCodigo);
-		String posicaoVariavel = semantico.buscaPosicaoSimbolo(tokenVariavel.getLexema());
-		geracaoCodigo.generateStr(posicaoVariavel);
 
+		if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tokenVariavel.getLexema())) {
+			String posicaoVariavel = semantico.buscaPosicaoSimbolo(tokenVariavel.getLexema());
+			geracaoCodigo.generateStr(posicaoVariavel);
+		}
+
+		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()) == null && !semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema())) {
+			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
+		}
 
 		posfixa = new Posfixa(); // limpa os arrays utilizados para a pos fixa
 
 		System.out.println(":::EXPRESSAO TIPOS PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressaoTipos);
 
-		if (semantico.pegaTipoVariavel(tokenVariavel.getLexema()) == null && !semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema())) {
-			throw SemanticoException.erroSemantico("Variavel ou funcao nao declarada", tokenVariavel.getLinha(), textAreaErro, textAreaCodigo);
-		}
+
 
 		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tokenVariavel.getLexema()) && pilhaEscopos.peek().isFunction()) {
 			System.out.println("Atribuicao para funcao, ou seja, retorno declarado");

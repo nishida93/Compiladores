@@ -37,7 +37,7 @@ public class TabelaSimbolos {
         for (Simbolo simbolo :
                 pilha) {
             //System.out.println("EXISTE VARIAVEL COM SIMBOLO > " + simbolo.toString());
-            if (simbolo.getLexema().equals(lexema)) {
+            if (simbolo.getLexema().equals(lexema) && simbolo instanceof SimboloVariavel) {
                 Collections.reverse(pilha);
                 return true;
             } else if (simbolo instanceof SimboloFuncao || simbolo instanceof SimboloProcedimento || simbolo instanceof SimboloPrograma) {

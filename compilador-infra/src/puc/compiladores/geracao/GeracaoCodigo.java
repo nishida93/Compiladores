@@ -60,7 +60,9 @@ public class GeracaoCodigo {
 	}
 
 	public void geraDalloc(final int posicaoVariaveis, final int qtdeVariaveis) {
-		fileWriter.println("DALLOC " + posicaoVariaveis + "," + qtdeVariaveis);
+		if (qtdeVariaveis > 0) {
+			fileWriter.println("DALLOC " + posicaoVariaveis + "," + qtdeVariaveis);
+		}
 	}
 
 	public void geraReturnf(final int posicaoVariaveis, final int qtdeVariaveis) {
