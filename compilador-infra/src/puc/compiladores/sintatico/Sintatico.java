@@ -163,7 +163,10 @@ public class Sintatico {
 		} else {
 			int currentScopePosition = pilhaEscopos.indexOf(pilhaEscopos.peek());
 			Scope scope = pilhaEscopos.get(currentScopePosition);
-			scope.setAllocFirstParameter(controleAllocs);
+			if (scope.getAllocFirstParameter() == 0) {
+				scope.setAllocFirstParameter(controleAllocs);
+			}
+
 			pilhaEscopos.set(currentScopePosition, scope);
             for (SimboloVariavel simboloVariavel:
                  simboloVariavelArrayList) {

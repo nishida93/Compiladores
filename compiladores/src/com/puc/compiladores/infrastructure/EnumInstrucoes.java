@@ -13,7 +13,7 @@ public enum EnumInstrucoes {
     JMP, JMPF, NULL, // jumps
     RD, PRN, // read and print
     ALLOC, DALLOC, // memory allocation
-    CALL, RETURN; // call procs and funcs
+    CALL, RETURN, RETURNF; // call procs and funcs
 
 
     EnumInstrucoes() {}
@@ -27,7 +27,5 @@ public enum EnumInstrucoes {
         }
         return false;
     }
-
-
 
 }
