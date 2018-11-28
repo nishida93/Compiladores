@@ -63,7 +63,7 @@ public class Arquivo extends JFileChooser {
             String comando = getPalavra(i, 0);
             String param1 = getPalavra(i, 1);
             String param2 = getPalavra(i, 2);
-            if(comando.equals("ALLOC") || comando.equals("DALLOC")) {
+            if(comando.equals("ALLOC") || comando.equals("DALLOC") || comando.equals(("RETURNF"))) {
                 String[] params = getPalavra(i, 1).split(",");
                 param1 = params[0];
                 param2 = params[1];
@@ -121,7 +121,7 @@ public class Arquivo extends JFileChooser {
         String comando = getPalavra(index, 0);
         String param1 = getPalavra(index, 1);
         String param2 = getPalavra(index, 2);
-        if(comando.equals("ALLOC") || comando.equals("DALLOC"))
+        if(comando.equals("ALLOC") || comando.equals("DALLOC") || comando.equals("RETURNF"))
         {
             String[] params = getPalavra(index, 1).split(",");
             param1 = params[0];
@@ -183,7 +183,7 @@ public class Arquivo extends JFileChooser {
             pilha.decrementaTopo();
         } else if(comando.equals(EnumInstrucoes.NEG.toString())) {
             // M[s]:=1 - M[s]
-            pilha.inserePilha(pilha.getTopo(), 1 - pilha.getTopo());
+            pilha.inserePilha(pilha.getTopo(), 1 - pilha.getValor(pilha.getTopo()));
         } else if(comando.equals(EnumInstrucoes.CME.toString())) {
             // se M[s-1] < M[s] então M[s-1]:=1 senão M[s-1]:=0; s:=s - 1
             if (pilha.getValor(pilha.getTopo() - 1) < pilha.getValor(pilha.getTopo())) {
@@ -303,6 +303,7 @@ public class Arquivo extends JFileChooser {
             /*ArrayList<Integer> test = new ArrayList<>();
             int x = test.remove(0);*/
             int valorFuncao = pilha.getValor(pilha.getTopo());
+            pilha.decrementaTopo();
 
             if (!param1.equals("") && !param2.equals("")) {
                 // DALLOC
