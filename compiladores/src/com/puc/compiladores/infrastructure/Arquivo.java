@@ -299,6 +299,26 @@ public class Arquivo extends JFileChooser {
             index = pilha.getValor(pilha.getTopo());
             pilha.decrementaTopo();
             return index;
+        } else if(comando.equals(EnumInstrucoes.RETURNF.toString())) {
+            /*ArrayList<Integer> test = new ArrayList<>();
+            int x = test.remove(0);*/
+            int valorFuncao = pilha.getValor(pilha.getTopo());
+
+            if (!param1.equals("") && !param2.equals("")) {
+                // DALLOC
+                for (int k=Integer.parseInt(param2) - 1; k >= 0; k--) {
+                    pilha.inserePilha(Integer.parseInt(param1) + k, pilha.getValor(pilha.getTopo()));
+                    pilha.decrementaTopo();
+                }
+            }
+
+            // RETURN
+            index = pilha.getValor(pilha.getTopo()-1);
+
+            pilha.inserePilha(pilha.getTopo(), valorFuncao);
+
+            return index;
+
         }
         return -98;
     }
