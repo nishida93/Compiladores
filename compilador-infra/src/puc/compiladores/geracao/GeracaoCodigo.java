@@ -7,11 +7,6 @@ import java.io.UnsupportedEncodingException;
 public class GeracaoCodigo {
 
 	private PrintWriter fileWriter;
-	private int rotulo;
-
-	public GeracaoCodigo() {
-		rotulo = 1;
-	}
 
 	public void generateFile(String lexema) throws FileNotFoundException, UnsupportedEncodingException {
 		try {
@@ -71,7 +66,6 @@ public class GeracaoCodigo {
 		} else {
 			fileWriter.println("RETURNF");
 		}
-
 	}
 
 	public void geraReturn() {

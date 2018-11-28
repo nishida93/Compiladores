@@ -390,8 +390,6 @@ public class Sintatico {
 		int auxrot1, auxrot2;
 		auxrot1 = rotulo;
 		rotulo++;
-		auxrot2 = rotulo;
-		rotulo++;
 		tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
@@ -432,15 +430,19 @@ public class Sintatico {
 			flagSeComandos=true;
 			analisaComandoSimples();
 			flagSeComandos=false;
-			geracaoCodigo.geraJump(LABEL_CONSTANT + auxrot2);
-			geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot1);
 			if (tk.getSimbolo().equals(Simbolo.SSENAO.getName())) {
+				auxrot2 = rotulo;
+				rotulo++;
+				geracaoCodigo.geraJump(LABEL_CONSTANT + auxrot2);
+				geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot1);
 				tk = sintaticoBuscaToken();
 				flagSeComandos=true;
 				analisaComandoSimples();
 				flagSeComandos=false;
+				geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot2);
+			} else {
+				geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot1);
 			}
-			geracaoCodigo.generateLabel(LABEL_CONSTANT + auxrot2);
 		} else {
 			throw SintaticoException.erroSintatico("[ANALISA SE] Faltou a palavra 'entao'", tk.getLinha(), textAreaErro, textAreaCodigo);
 		}
