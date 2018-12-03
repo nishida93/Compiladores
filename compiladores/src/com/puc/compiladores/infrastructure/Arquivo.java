@@ -314,7 +314,7 @@ public class Arquivo extends JFileChooser {
             }
 
             // RETURN
-            index = pilha.getValor(pilha.getTopo()-1);
+            index = pilha.getValor(pilha.getTopo());
 
             pilha.inserePilha(pilha.getTopo(), valorFuncao);
 
