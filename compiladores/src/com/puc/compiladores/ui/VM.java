@@ -350,5 +350,6 @@ public class VM extends JFrame {
 
     public void clearOutput() {
         textAreaSaida.setText("");
+        pilhaNova = new Pilha();
     }
 }

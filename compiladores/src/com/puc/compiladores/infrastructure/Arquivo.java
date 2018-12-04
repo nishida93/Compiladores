@@ -63,10 +63,17 @@ public class Arquivo extends JFileChooser {
             String comando = getPalavra(i, 0);
             String param1 = getPalavra(i, 1);
             String param2 = getPalavra(i, 2);
-            if(comando.equals("ALLOC") || comando.equals("DALLOC") || comando.equals(("RETURNF"))) {
+            if(comando.equals("ALLOC") || comando.equals("DALLOC")) {
                 String[] params = getPalavra(i, 1).split(",");
                 param1 = params[0];
                 param2 = params[1];
+            }
+            if(comando.equals("RETURNF")) {
+                String[] params = getPalavra(i, 1).split(",");
+                if(params[0] != ""){
+                    param1 = params[0];
+                    param2 = params[1];
+                }
             }
             palavra = adicionaElemento(palavra, comando);
             palavra = adicionaElemento(palavra, param1);
@@ -121,11 +128,19 @@ public class Arquivo extends JFileChooser {
         String comando = getPalavra(index, 0);
         String param1 = getPalavra(index, 1);
         String param2 = getPalavra(index, 2);
-        if(comando.equals("ALLOC") || comando.equals("DALLOC") || comando.equals("RETURNF"))
+        if(comando.equals("ALLOC") || comando.equals("DALLOC"))
         {
             String[] params = getPalavra(index, 1).split(",");
             param1 = params[0];
             param2 = params[1];
+        }
+
+        if(comando.equals("RETURNF")) {
+            String[] params = getPalavra(index, 1).split(",");
+            if(params[0] != ""){
+                param1 = params[0];
+                param2 = params[1];
+            }
         }
 
         if (comando.equals(EnumInstrucoes.START.toString())) {
