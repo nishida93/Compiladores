@@ -247,7 +247,9 @@ public class Semantico {
                 geracaoCodigo.generateLdc(value);
             } else if (tabelaSimbolos.existeVariavel(value)) { // EH UMA VARIAVEL
                 geracaoCodigo.generateLdv(tabelaSimbolos.buscaPosicaoSimbolo(value));
-            } else { // EH UM OPERADOR OU PALAVRA RESERVADA
+            } else if (tabelaSimbolos.existeFuncao(value)) { // EH UMA VARIAVEL
+				geracaoCodigo.generateCall(tabelaSimbolos.buscaRotuloFuncao(value));
+			} else { // EH UM OPERADOR OU PALAVRA RESERVADA
                 if (OPERADORES_ARITMETICOS.contains(value)) {
                     if (value.equals("+")) {
                         geracaoCodigo.generateSimpleInstruction("ADD");

@@ -331,7 +331,6 @@ public class Sintatico {
 		}
 	}
 
-	// geracao done
 	private void analisaEnquanto() throws SintaticoException, LexicoException, SemanticoException {
 		int auxrot1 = 0,
 			auxrot2 = 0;
@@ -644,7 +643,6 @@ public class Sintatico {
 
 	private void analisaChamadaFuncao() throws LexicoException, SemanticoException {
 		if (semantico.pesquisaDeclaracaoFuncaoTabelaSimbolos(tk.getLexema())) {
-			geracaoCodigo.generateCall(semantico.buscaRotuloFuncao(tk.getLexema()));
 			tk = sintaticoBuscaToken();
 		} else {
 			throw SemanticoException.erroSemantico("Chamada de funcao invalida, pois funcao nao existe", tk.getLinha(), textAreaErro, textAreaCodigo);
@@ -659,8 +657,6 @@ public class Sintatico {
 	}
 
 	private void analisaAtribuicao(final Token tokenVariavel) throws SintaticoException, LexicoException, SemanticoException {
-		//System.out.println("O TOKEN PARA ATRIBUICAO EHHH:" + tokenVariavel.toString());
-		//System.out.println(semantico.pegaTipoVariavel(tokenVariavel.getLexema()));
         tk = sintaticoBuscaToken();
 		arrayExpressao = new ArrayList<>();
 		arrayExpressaoTipos = new ArrayList<>();
@@ -675,7 +671,6 @@ public class Sintatico {
 		System.out.println(":::EXPRESSAO PARA ANALISA ATRIBUICAO POSFIXA:::");
 		arrayPosfixa = posfixa.trataPofixa(arrayExpressao);
 		printaExpressao(arrayPosfixa);
-		// TODO finalizar a geracao da expressao
 		semantico.geraCodigoExpressao(arrayPosfixa, geracaoCodigo);
 
 		if (semantico.pesquisaDeclaracaoVariavelTabelaSimbolos(tokenVariavel.getLexema())) {
