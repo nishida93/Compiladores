@@ -126,11 +126,21 @@ public class Sintatico {
 		}
 	}
 
+	private boolean auxVerificaArrayVariaveis(final String lexema) {
+		for (SimboloVariavel simbolo : simboloVariavelArrayList) {
+			if (simbolo.getLexema()
+					   .equals(lexema)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void analisaVariaveis() throws SintaticoException, LexicoException, SemanticoException {
 		simboloVariavelArrayList = new ArrayList<>();
 		while(!tk.getSimbolo().equals(Simbolo.SDOISPONTOS.getName())) {
 			if (tk.getSimbolo().equals(Simbolo.SIDENTIFICADOR.getName())) {
-                if (!semantico.existeDuplicidadeVariavel(tk.getLexema())) {
+                if (!semantico.existeDuplicidadeVariavel(tk.getLexema()) && !auxVerificaArrayVariaveis(tk.getLexema())) {
                     simboloVariavelArrayList.add(new SimboloVariavel(tk.getLexema(), "", "", "", posicaoVariaveis));
 
                     posicaoVariaveis++;
